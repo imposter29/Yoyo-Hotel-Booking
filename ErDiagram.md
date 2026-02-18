@@ -26,17 +26,7 @@ HOTELS {
     string country
     int star_rating
     string contact_email
-    string contact_phone
     boolean is_active
-    datetime created_at
-}
-
-CANCELLATION_POLICIES {
-    string id PK
-    string name
-    string description
-    int free_cancellation_hours
-    json tiers
     datetime created_at
 }
 
@@ -45,7 +35,6 @@ ROOM_TYPES {
     string hotel_id FK
     string cancellation_policy_id FK
     string name
-    string description
     int max_occupancy
     decimal base_rate_per_night
     json amenities
@@ -63,7 +52,7 @@ ROOMS {
     datetime created_at
 }
 
-ROOM_INVENTORY_DAILY {
+INVENTORY_CALENDAR {
     string id PK
     string room_type_id FK
     date date
@@ -112,7 +101,6 @@ BOOKINGS {
     datetime hold_expires_at
     datetime confirmed_at
     datetime cancelled_at
-    string cancellation_reason
     datetime created_at
     datetime updated_at
 }
@@ -129,28 +117,6 @@ BOOKING_ITEMS {
     decimal final_price_per_night
     decimal total_price
     json pricing_breakdown
-    datetime created_at
-}
-
-ADD_ON_SERVICES {
-    string id PK
-    string hotel_id FK
-    string name
-    string description
-    decimal price_per_unit
-    string unit
-    string category
-    boolean is_active
-    datetime created_at
-}
-
-BOOKING_ADDONS {
-    string id PK
-    string booking_id FK
-    string add_on_service_id FK
-    int quantity
-    decimal unit_price
-    decimal total_price
     datetime created_at
 }
 
@@ -181,18 +147,25 @@ INVOICES {
     decimal tax_rate
     decimal tax_amount
     decimal total_amount
-    string currency
     datetime issued_at
+    datetime created_at
+}
+
+CANCELLATION_POLICIES {
+    string id PK
+    string name
+    string description
+    int free_cancellation_hours
+    json tiers
     datetime created_at
 }
 
 HOTELS ||--o{ ROOM_TYPES : has
 HOTELS ||--o{ ROOMS : contains
 HOTELS ||--o{ SEASONS : defines
-HOTELS ||--o{ ADD_ON_SERVICES : offers
 
 ROOM_TYPES ||--o{ ROOMS : categorizes
-ROOM_TYPES ||--o{ ROOM_INVENTORY_DAILY : tracks
+ROOM_TYPES ||--o{ INVENTORY_CALENDAR : tracks
 ROOM_TYPES ||--o{ PRICING_RULES : governed_by
 ROOM_TYPES }o--|| CANCELLATION_POLICIES : uses
 
@@ -202,14 +175,11 @@ USERS ||--o{ BOOKINGS : places
 HOTELS ||--o{ BOOKINGS : hosts
 
 BOOKINGS ||--|{ BOOKING_ITEMS : contains
-BOOKINGS ||--o{ BOOKING_ADDONS : includes
 BOOKINGS ||--o| PAYMENTS : paid_via
 BOOKINGS ||--o| INVOICES : generates
 
 BOOKING_ITEMS }o--|| ROOMS : reserves
 BOOKING_ITEMS }o--|| ROOM_TYPES : of_type
-
-BOOKING_ADDONS }o--|| ADD_ON_SERVICES : references
 
 PAYMENTS ||--o| INVOICES : linked_to
 ```
