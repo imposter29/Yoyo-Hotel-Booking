@@ -18,7 +18,7 @@ const hotelSchema = new mongoose.Schema(
       maxlength: [2000, 'Description cannot exceed 2000 characters'],
     },
     address: {
-      street: { type: String, required: true },
+      street: { type: String, default: '' },
       city: { type: String, required: true },
       state: String,
       country: { type: String, required: true },
@@ -64,7 +64,16 @@ const hotelSchema = new mongoose.Schema(
     },
     isActive: {
       type: Boolean,
-      default: true,
+      default: false,   // only true after superadmin approves
+    },
+    approvalStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    rejectionReason: {
+      type: String,
+      default: '',
     },
     // Hotel owner/admin user
     managedBy: {
