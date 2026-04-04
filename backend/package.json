@@ -6,19 +6,28 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "seed": "node seeds/seedHotels.js",
+    "seed:file": "node seeds/seedHotels.js --file",
+    "seed:destroy": "node seeds/seedHotels.js --destroy",
+    "seed:google": "node seeds/seedGoogleHotels.js",
+    "seed:google:destroy": "node seeds/seedGoogleHotels.js --destroy",
     "test": "NODE_ENV=test jest --forceExit --detectOpenHandles"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "csv-parse": "^6.2.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.3.2",
     "helmet": "^7.1.0",
+    "joi": "^18.1.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.0",
     "morgan": "^1.10.0",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "nodemailer": "^8.0.5"
   },
   "devDependencies": {
     "jest": "^29.7.0",
