@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
+const notificationService = require('../services/notification/notificationService');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const sendTokenResponse = (user, statusCode, res) => {
@@ -23,10 +24,14 @@ const sendTokenResponse = (user, statusCode, res) => {
 
 // ─── Register ─────────────────────────────────────────────────────────────────
 exports.register = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password, phone } = req.body;
+  const { firstName, lastName, email, password, phone, role } = req.body;
 
   const existing = await User.findOne({ email });
   if (existing) return next(new AppError('An account with this email already exists.', 409));
+
+  // Only allow guest or hotel_admin — never let users self-assign superadmin
+  const allowedRoles = ['guest', 'hotel_admin'];
+  const assignedRole = allowedRoles.includes(role) ? role : 'guest';
 
   const user = await User.create({
     firstName,
@@ -34,7 +39,11 @@ exports.register = asyncHandler(async (req, res, next) => {
     email,
     passwordHash: password, // pre-save hook hashes it
     phone,
+    role: assignedRole,
   });
+
+  // Fire-and-forget welcome email
+  notificationService.sendWelcomeEmail(user);
 
   sendTokenResponse(user, 201, res);
 });
@@ -62,4 +71,34 @@ exports.logout = asyncHandler(async (req, res) => {
 // ─── Get current user ─────────────────────────────────────────────────────────
 exports.getMe = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: { user: req.user } });
+});
+
+// ─── Update profile ───────────────────────────────────────────────────────────
+exports.updateProfile = asyncHandler(async (req, res, next) => {
+  const { firstName, lastName, phone } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { firstName, lastName, phone },
+    { new: true, runValidators: true }
+  );
+
+  if (!user) return next(new AppError('User not found.', 404));
+  res.status(200).json({ success: true, data: { user } });
+});
+
+// ─── Change password ──────────────────────────────────────────────────────────
+exports.changePassword = asyncHandler(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(req.user._id).select('+passwordHash');
+  if (!user) return next(new AppError('User not found.', 404));
+
+  const isMatch = await user.comparePassword(currentPassword);
+  if (!isMatch) return next(new AppError('Current password is incorrect.', 401));
+
+  user.passwordHash = newPassword; // pre-save hook will hash it
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
 });
