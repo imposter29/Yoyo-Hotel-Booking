@@ -7,12 +7,19 @@ const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
+const { apiLimiter } = require('./middleware/rateLimiter');
 const { startHoldExpiryJob } = require('./jobs/holdExpiryJob');
 
 // ─── Route imports ────────────────────────────────────────────────────────────
-const authRoutes = require('./routes/auth.routes');
-const hotelRoutes = require('./routes/hotel.routes');
-const bookingRoutes = require('./routes/booking.routes');
+const authRoutes      = require('./routes/auth.routes');
+const hotelRoutes     = require('./routes/hotel.routes');
+const bookingRoutes   = require('./routes/booking.routes');
+const cityRoutes      = require('./routes/city.routes');
+const dealsRoutes     = require('./routes/deals.routes');
+const newsletterRoutes = require('./routes/newsletter.routes');
+const paymentRoutes   = require('./routes/payment.routes');
+const roomTypeRoutes  = require('./routes/roomType.routes');
+const adminRoutes     = require('./routes/admin.routes');
 
 const app = express();
 
@@ -35,6 +42,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// ─── Global Rate Limiter ──────────────────────────────────────────────────────
+app.use('/api', apiLimiter);
+
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'Yoyo-Hotel-Booking API', timestamp: new Date() });
@@ -43,9 +53,15 @@ app.get('/health', (req, res) => {
 // ─── API Routes ───────────────────────────────────────────────────────────────
 const API_VERSION = '/api/v1';
 
-app.use(`${API_VERSION}/auth`, authRoutes);
-app.use(`${API_VERSION}/hotels`, hotelRoutes);
-app.use(`${API_VERSION}/bookings`, bookingRoutes);
+app.use(`${API_VERSION}/auth`,       authRoutes);
+app.use(`${API_VERSION}/hotels`,     hotelRoutes);
+app.use(`${API_VERSION}/bookings`,   bookingRoutes);
+app.use(`${API_VERSION}/payments`,   paymentRoutes);
+app.use(`${API_VERSION}/room-types`, roomTypeRoutes);
+app.use(`${API_VERSION}/cities`,     cityRoutes);
+app.use(`${API_VERSION}/deals`,      dealsRoutes);
+app.use(`${API_VERSION}/newsletter`, newsletterRoutes);
+app.use(`${API_VERSION}/admin`,      adminRoutes);
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -67,6 +83,16 @@ if (process.env.NODE_ENV !== 'test') {
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`🚀 Yoyo Hotel Booking API running on port ${PORT} [${process.env.NODE_ENV}]`);
+  console.log(`📋 API Endpoints:`);
+  console.log(`   Auth:       ${API_VERSION}/auth`);
+  console.log(`   Hotels:     ${API_VERSION}/hotels`);
+  console.log(`   Bookings:   ${API_VERSION}/bookings`);
+  console.log(`   Payments:   ${API_VERSION}/payments`);
+  console.log(`   Room Types: ${API_VERSION}/room-types`);
+  console.log(`   Cities:     ${API_VERSION}/cities`);
+  console.log(`   Deals:      ${API_VERSION}/deals`);
+  console.log(`   Newsletter: ${API_VERSION}/newsletter`);
+  console.log(`   Admin:      ${API_VERSION}/admin`);
 });
 
 // Graceful shutdown
