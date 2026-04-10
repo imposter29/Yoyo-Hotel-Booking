@@ -1,6 +1,27 @@
 const InventoryCalendar = require('../../models/InventoryCalendar');
 const Room = require('../../models/Room');
 
+// ─── Utility ──────────────────────────────────────────────────────────────────
+
+/** Strip time → local midnight (matches how the seeder stored dates) */
+function toLocalMidnight(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Return array of local-midnight dates: [checkIn, checkIn+1, … checkOut-1] */
+function getDateRange(checkIn, checkOut) {
+  const dates = [];
+  const current = toLocalMidnight(checkIn);
+  const end     = toLocalMidnight(checkOut);
+  while (current < end) {
+    dates.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+  return dates;
+}
+
 /**
  * Check if at least one room of the given type is available
  * across the entire date range.
@@ -9,13 +30,14 @@ const Room = require('../../models/Room');
  */
 async function checkAvailability(roomTypeId, checkIn, checkOut) {
   const dates = getDateRange(checkIn, checkOut);
+  if (dates.length === 0) return false;
 
   const inventoryDocs = await InventoryCalendar.find({
     roomType: roomTypeId,
-    date: { $gte: checkIn, $lt: checkOut },
+    date: { $gte: dates[0], $lte: dates[dates.length - 1] },
   });
 
-  if (inventoryDocs.length < dates.length) return false; // missing calendar entries = no availability
+  if (inventoryDocs.length < dates.length) return false; // missing entries = no availability
 
   return inventoryDocs.every((doc) => doc.availableCount > 0);
 }
@@ -28,6 +50,7 @@ async function checkAvailability(roomTypeId, checkIn, checkOut) {
  */
 async function reserveRoom(roomTypeId, checkIn, checkOut) {
   const dates = getDateRange(checkIn, checkOut);
+  if (dates.length === 0) return null;
 
   // Use a session for atomic multi-doc update
   const mongoose = require('mongoose');
@@ -90,17 +113,6 @@ async function releaseInventory(roomTypeId, checkIn, checkOut, fromStatus = 'hel
     { roomType: roomTypeId, date: { $in: dates } },
     { $inc: inc }
   );
-}
-
-// ─── Utility ──────────────────────────────────────────────────────────────────
-function getDateRange(checkIn, checkOut) {
-  const dates = [];
-  const current = new Date(checkIn);
-  while (current < checkOut) {
-    dates.push(new Date(current));
-    current.setDate(current.getDate() + 1);
-  }
-  return dates;
 }
 
 module.exports = { checkAvailability, reserveRoom, releaseInventory };
