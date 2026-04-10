@@ -6,6 +6,7 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { computePrice } = require('../services/pricing/YieldPricingEngine');
 const { checkAvailability, reserveRoom } = require('../services/booking/AvailabilityService');
+const notificationService = require('../services/notification/notificationService');
 
 // @desc  Check room availability and get a price quote
 // @route POST /api/bookings/check
@@ -56,11 +57,13 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
   const pricing = await computePrice(roomTypeId, checkInDate, checkOutDate);
 
   // 3. Create booking in HOLD
+  const nights = Math.max(1, Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)));
   const booking = await Booking.create({
     guest: req.user._id,
     hotel: roomType.hotel._id,
     checkIn: checkInDate,
     checkOut: checkOutDate,
+    totalNights: nights,
     guestCount,
     guestRequests,
     status: 'hold',
@@ -90,6 +93,7 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
     },
   });
 });
+
 
 // @desc  Get all bookings for the logged-in guest
 // @route GET /api/bookings/my
@@ -136,6 +140,9 @@ exports.cancelBooking = asyncHandler(async (req, res, next) => {
   booking.transitionTo('cancelled');
   booking.cancellationReason = req.body.reason || 'Guest requested cancellation';
   await booking.save();
+
+  // Fire-and-forget cancellation email
+  notificationService.sendBookingCancellation(booking, req.user);
 
   res.status(200).json({ success: true, data: { booking } });
 });
