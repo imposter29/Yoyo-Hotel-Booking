@@ -1,0 +1,145 @@
+/* ─── Navbar Container ─────────────────────────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s ease;
+}
+.navbar--scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.12); }
+
+/* ─── Main Nav Row ─────────────────────────────────────────────────────────── */
+.navbar-main { padding: 14px 0; }
+.navbar-main-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── Logo ─────────────────────────────────────────────────────────────────── */
+.navbar-logo { display: flex; align-items: center; text-decoration: none; }
+.logo-yoyo {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0;
+  font-style: normal;
+  padding-right: 2px;          /* prevents last letter clip */
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;       /* needed for background-clip to work properly */
+}
+
+/* ─── Auth ─────────────────────────────────────────────────────────────────── */
+.navbar-auth { display: flex; align-items: center; }
+.nav-auth-group { display: flex; align-items: center; gap: 8px; }
+
+/* User button */
+.nav-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.nav-user-btn:hover { background: #ebebeb; }
+.nav-user-name { font-size: 14px; font-weight: 600; color: #0f0f0f; }
+.nav-chevron { font-size: 11px; color: #737373; }
+
+/* Avatar */
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: white;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.avatar-lg { width: 40px; height: 40px; font-size: 16px; }
+
+/* ─── User Dropdown ────────────────────────────────────────────────────────── */
+.user-menu-wrapper { position: relative; }
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  min-width: 220px;
+  overflow: hidden;
+  animation: fadeDown 0.18s ease;
+  z-index: 200;
+}
+.user-dropdown-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px; background: #fafafa;
+}
+.user-name  { font-size: 14px; font-weight: 700; color: #0f0f0f; }
+.user-email { font-size: 12px; color: #737373; margin-top: 2px; }
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  font-size: 14px; color: #404040;
+  background: none; border: none;
+  width: 100%; text-align: left;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.dropdown-item:hover { background: #f5f5f5; color: #0f0f0f; }
+.dropdown-item--red { color: #ef4444; }
+.dropdown-item--red:hover { background: #fef2f2; color: #ef4444; }
+.dropdown-item--highlight { color: #0f0f0f; font-weight: 600; }
+.dropdown-item--highlight:hover { background: #fff5f5; color: #ef4444; }
+.user-dropdown .divider { margin: 4px 0; }
+
+/* ─── City Nav ─────────────────────────────────────────────────────────────── */
+.navbar-cities {
+  background: white;
+  border-top: 1px solid #f0f0f0;
+}
+.city-nav {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.city-nav::-webkit-scrollbar { display: none; }
+.city-nav-link {
+  padding: 10px 16px;
+  font-size: 13px; font-weight: 500;
+  color: #525252;
+  background: none; border: none;
+  cursor: pointer; white-space: nowrap;
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.city-nav-link:hover { color: #0f0f0f; border-bottom-color: #ef4444; }
+.city-nav-link--all { color: #737373; margin-left: auto; font-style: italic; }
+
+/* ─── Animations ───────────────────────────────────────────────────────────── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .logo-yoyo { font-size: 22px; }
+  .city-nav-link { padding: 8px 12px; font-size: 12px; }
+  .city-nav-link--all { margin-left: 0; }
+  .nav-user-name { display: none; }
+  .nav-chevron { display: none; }
+  .nav-user-btn { padding: 4px; }
+}

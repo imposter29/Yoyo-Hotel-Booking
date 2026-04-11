@@ -1,0 +1,205 @@
+/* ─── Footer Base ─────────────────────────────────────────────────────────────── */
+.footer { background: #2d2d2d; color: rgba(255,255,255,0.8); font-size: 13px; }
+
+/* ─── Main ───────────────────────────────────────────────────────────────────── */
+.footer-main { padding: 48px 0 32px; }
+
+/* ─── Top Row ────────────────────────────────────────────────────────────────── */
+.footer-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+/* ─── Brand ──────────────────────────────────────────────────────────────────── */
+.footer-brand { flex: 1; min-width: 220px; }
+.footer-logo { margin-bottom: 8px; }
+.footer-logo-text {
+  font-size: 32px;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0;
+  padding-right: 3px;
+  display: inline-block;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-tagline { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px; font-weight: 500; }
+.footer-download-text { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+
+/* ─── App Buttons ────────────────────────────────────────────────────────────── */
+.footer-app-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.app-store-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: white;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.app-store-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
+.app-icon { font-size: 20px; }
+.app-btn-sub { font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1; }
+.app-btn-main { font-size: 14px; font-weight: 700; line-height: 1.4; }
+
+/* ─── List Property CTA ──────────────────────────────────────────────────────── */
+.footer-list-property { flex-shrink: 0; }
+.footer-cta-box {
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 24px 28px;
+  text-align: center;
+  max-width: 320px;
+}
+.footer-cta-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.footer-list-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  color: #1a1a1a;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+.footer-list-btn:hover { background: #f5f5f5; transform: translateY(-1px); }
+
+/* ─── Divider ────────────────────────────────────────────────────────────────── */
+.footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 28px 0; }
+
+/* ─── Link Columns ────────────────────────────────────────────────────────────── */
+.footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-bottom: 28px;
+}
+.footer-link-col {}
+.footer-link-heading {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+.footer-link-col ul { display: flex; flex-direction: column; gap: 10px; }
+.footer-link {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  line-height: 1.4;
+}
+.footer-link:hover { color: white; }
+
+/* ─── City Grid ──────────────────────────────────────────────────────────────── */
+.footer-cities-section { margin-bottom: 28px; }
+.footer-cities-heading {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+.footer-cities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px 16px;
+  max-height: 320px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.footer-cities-grid.expanded { max-height: none; }
+.footer-city-item {}
+.footer-city-link {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  display: block;
+  padding: 3px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.footer-city-link:hover { color: rgba(255,255,255,0.9); }
+.footer-city-link--special { color: rgba(255,255,255,0.8); font-weight: 600; }
+
+/* ─── Skeleton for cities ────────────────────────────────────────────────────── */
+.footer-cities-skeleton {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 16px;
+}
+.cities-column-skeleton {}
+.footer-cities-skeleton .skeleton { background: rgba(255,255,255,0.08); }
+
+/* ─── Countries ──────────────────────────────────────────────────────────────── */
+.footer-countries { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.footer-countries-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.footer-countries-list { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-country { display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,0.7); }
+.country-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ─── Bottom Bar ─────────────────────────────────────────────────────────────── */
+.footer-bottom {
+  background: rgba(0,0,0,0.3);
+  padding: 16px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.footer-bottom-content { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.footer-social { display: flex; gap: 8px; }
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.social-icon:hover { background: rgba(255,255,255,0.18); color: white; transform: translateY(-2px); }
+.footer-copyright { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+/* ─── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .footer-links-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-cities-skeleton { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 768px) {
+  .footer-main { padding: 32px 0 24px; }
+  .footer-top-row { flex-direction: column; gap: 28px; }
+  .footer-links-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .footer-cities-skeleton { grid-template-columns: repeat(2, 1fr); }
+  .footer-bottom-content { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+@media (max-width: 480px) {
+  .footer-links-grid { grid-template-columns: 1fr; }
+  .footer-cities-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
