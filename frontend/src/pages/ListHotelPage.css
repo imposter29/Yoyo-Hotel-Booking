@@ -1,0 +1,199 @@
+.list-hotel-page {
+  min-height: 100vh;
+  background: #fafafa;
+  padding-bottom: 80px;
+}
+
+/* ── Hero ── */
+.list-hero {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 64px 0 48px;
+  margin-bottom: 40px;
+}
+.list-hero-content {
+  max-width: 640px;
+}
+.list-hero-badge {
+  display: inline-block;
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+.list-hero h1 {
+  font-size: 36px;
+  font-weight: 900;
+  color: white;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+.list-hero p {
+  font-size: 15px;
+  color: #a3a3a3;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Form wrapper ── */
+.list-form-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ── Steps ── */
+.list-steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 32px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  overflow: hidden;
+}
+.list-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-right: 1px solid #e5e5e5;
+  transition: background 0.15s;
+}
+.list-step:last-child { border-right: none; }
+.list-step:hover { background: #fafafa; }
+.list-step.active { background: #fff5f5; }
+.list-step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  background: #f0f0f0; color: #737373;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.list-step.active .list-step-num {
+  background: #ef4444; color: white;
+}
+.list-step.done .list-step-num {
+  background: #16a34a; color: white;
+}
+.list-step-label {
+  font-size: 13px; font-weight: 600;
+  color: #737373;
+}
+.list-step.active .list-step-label { color: #ef4444; }
+.list-step.done .list-step-label { color: #16a34a; }
+
+/* ── Form ── */
+.list-form {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e5e5;
+  overflow: hidden;
+}
+.list-section { padding: 32px; }
+.list-section-title {
+  font-size: 18px; font-weight: 800;
+  margin: 0 0 24px;
+  color: #0f0f0f;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.list-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.list-field { display: flex; flex-direction: column; }
+.list-field.full { grid-column: 1 / -1; }
+
+/* ── Star selector ── */
+.star-selector {
+  display: flex; align-items: center; gap: 4px; padding-top: 4px;
+}
+.star-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 28px; color: #e5e5e5;
+  transition: color 0.1s; padding: 0 2px;
+}
+.star-btn.active { color: #f59e0b; }
+.star-label {
+  margin-left: 8px; font-size: 14px; font-weight: 600; color: #525252;
+}
+
+/* ── Amenity pills ── */
+.amenity-grid {
+  display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px;
+}
+.amenity-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  background: #f5f5f5; border: 1.5px solid #e5e5e5; color: #525252;
+  transition: all 0.15s; user-select: none;
+}
+.amenity-pill.on {
+  background: #fee2e2; border-color: #ef4444; color: #ef4444;
+}
+
+/* ── Policy pills ── */
+.policy-checks { display: flex; gap: 12px; padding-top: 8px; }
+.policy-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  background: #f5f5f5; border: 1.5px solid #e5e5e5; color: #525252;
+  transition: all 0.15s; user-select: none;
+}
+.policy-pill.on {
+  background: #f0fdf4; border-color: #16a34a; color: #16a34a;
+}
+
+/* ── Review box ── */
+.list-review-box {
+  background: #fafafa; border: 1px solid #e5e5e5;
+  border-radius: 12px; padding: 20px; margin: 24px 0;
+}
+.list-review-box h4 {
+  font-size: 14px; font-weight: 700; margin: 0 0 14px;
+}
+.list-review-grid {
+  display: grid; grid-template-columns: 120px 1fr;
+  gap: 6px 16px; font-size: 13px;
+}
+.list-review-grid span { color: #737373; }
+.list-review-note {
+  margin: 14px 0 0; font-size: 12px; color: #737373;
+  padding-top: 12px; border-top: 1px solid #e5e5e5;
+}
+
+/* ── Nav ── */
+.list-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 24px; border-top: 1px solid #f0f0f0; margin-top: 24px;
+}
+
+/* ── Success ── */
+.list-success-card {
+  max-width: 480px; margin: 80px auto; text-align: center;
+  background: white; border: 1px solid #e5e5e5; border-radius: 20px;
+  padding: 48px 40px;
+}
+.list-success-icon { font-size: 56px; margin-bottom: 16px; }
+.list-success-card h2 { font-size: 24px; font-weight: 800; margin: 0 0 12px; }
+.list-success-card p { color: #525252; font-size: 15px; line-height: 1.6; margin: 0 0 8px; }
+.list-success-note { font-size: 13px; color: #737373; margin-bottom: 24px !important; }
+
+@media (max-width: 640px) {
+  .list-grid { grid-template-columns: 1fr; }
+  .list-field.full { grid-column: 1; }
+  .list-steps { flex-direction: column; }
+  .list-step { border-right: none; border-bottom: 1px solid #e5e5e5; }
+  .list-step:last-child { border-bottom: none; }
+  .list-hero h1 { font-size: 26px; }
+}
