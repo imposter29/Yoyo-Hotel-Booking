@@ -1,0 +1,44 @@
+.my-bookings-page { min-height: 100vh; display: flex; flex-direction: column; }
+.page-title { font-size: 28px; font-weight: 800; color: #0f0f0f; margin-bottom: 4px; }
+.page-subtitle { font-size: 14px; color: #737373; margin-bottom: 32px; }
+
+.bookings-list { display: flex; flex-direction: column; gap: 16px; }
+
+.booking-card {
+  background: white;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+.booking-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+.booking-card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px 0; gap: 16px; }
+.booking-hotel-name { font-size: 18px; font-weight: 700; color: #0f0f0f; margin-bottom: 4px; }
+.booking-location { font-size: 13px; color: #737373; }
+
+.booking-card-body { padding: 16px 24px; }
+.booking-dates { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.booking-date-item { display: flex; flex-direction: column; gap: 3px; }
+.booking-date-label { font-size: 11px; font-weight: 700; color: #a3a3a3; text-transform: uppercase; letter-spacing: 0.5px; }
+.booking-date-value { font-size: 15px; font-weight: 700; color: #0f0f0f; }
+.booking-date-arrow { color: #d4d4d4; font-size: 18px; }
+.booking-meta { display: flex; gap: 20px; font-size: 14px; color: #525252; font-weight: 500; }
+
+.booking-card-footer { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-top: 1px solid #f0f0f0; flex-wrap: wrap; gap: 12px; }
+.booking-price-total { display: flex; flex-direction: column; gap: 2px; }
+.booking-price-label { font-size: 11px; font-weight: 700; color: #a3a3a3; text-transform: uppercase; letter-spacing: 0.5px; }
+.booking-price-amt { font-size: 22px; font-weight: 800; color: #0f0f0f; }
+.booking-actions { display: flex; gap: 8px; }
+
+.bookings-empty { text-align: center; padding: 80px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.empty-icon { font-size: 64px; }
+.bookings-empty h3 { font-size: 22px; font-weight: 700; color: #0f0f0f; }
+.bookings-empty p { font-size: 14px; color: #737373; }
+.bookings-error { color: #dc2626; padding: 20px; background: #fef2f2; border-radius: 8px; font-size: 14px; }
+
+@media (max-width: 768px) {
+  .booking-card-header { flex-direction: column; }
+  .booking-dates { flex-wrap: wrap; }
+  .booking-card-footer { flex-direction: column; align-items: flex-start; }
+}
