@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
-import { authService } from '../services/authService';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -32,16 +32,12 @@ function authReducer(state, action) {
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Rehydrate user on app mount
   useEffect(() => {
     const rehydrate = async () => {
-      if (!state.token) {
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
+      if (!state.token) { dispatch({ type: 'SET_LOADING', payload: false }); return; }
       try {
-        const { data } = await authService.getMe();
-        dispatch({ type: 'SET_USER', payload: data.data.user });
+        const data = await authAPI.getMe();
+        dispatch({ type: 'SET_USER', payload: data.data?.user || null });
       } catch {
         dispatch({ type: 'LOGOUT' });
       }
@@ -51,20 +47,20 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     dispatch({ type: 'SET_LOADING', payload: true });
-    const { data } = await authService.login(credentials);
-    dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.data.user, token: data.token } });
-    return data.data.user;
+    const data = await authAPI.login(credentials);
+    dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.data?.user, token: data.token } });
+    return data.data?.user;
   };
 
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: true });
-    const { data } = await authService.register(userData);
-    dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.data.user, token: data.token } });
-    return data.data.user;
+    const data = await authAPI.register(userData);
+    dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.data?.user, token: data.token } });
+    return data.data?.user;
   };
 
-  const logout = async () => {
-    await authService.logout();
+  const logout = () => {
+    authAPI.logout();
     dispatch({ type: 'LOGOUT' });
   };
 

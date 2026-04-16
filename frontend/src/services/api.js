@@ -1,37 +1,115 @@
-import axios from 'axios';
+// Central API service layer
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+async function request(path, options = {}) {
+  const token = localStorage.getItem('yoyo_token');
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true, // send cookies
-  headers: {
-    'Content-Type': 'application/json',
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Request failed');
+  return data;
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+export const authAPI = {
+  register:       (body) => request('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
+  login:          (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
+  getMe:          () => request('/auth/me'),
+  logout:         () => { localStorage.removeItem('yoyo_token'); },
+  updateProfile:  (body) => request('/auth/profile', { method: 'PATCH', body: JSON.stringify(body) }),
+  changePassword: (body) => request('/auth/change-password', { method: 'PATCH', body: JSON.stringify(body) }),
+};
+
+// ─── Hotels ──────────────────────────────────────────────────────────────────
+export const hotelsAPI = {
+  search:  (params) => { const qs = new URLSearchParams(params).toString(); return request(`/hotels?${qs}`); },
+  getAll:  (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/hotels?${qs}`); },
+  getById: (id) => request(`/hotels/${id}`),
+  create:  (body) => request('/hotels', { method: 'POST', body: JSON.stringify(body) }),
+  update:  (id, body) => request(`/hotels/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  delete:  (id) => request(`/hotels/${id}`, { method: 'DELETE' }),
+};
+
+// ─── Room Types ───────────────────────────────────────────────────────────────
+export const roomTypesAPI = {
+  getAll:   (hotelId) => request(`/room-types?hotelId=${hotelId}`),
+  getById:  (id) => request(`/room-types/${id}`),
+  create:   (body) => request('/room-types', { method: 'POST', body: JSON.stringify(body) }),
+  update:   (id, body) => request(`/room-types/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  delete:   (id) => request(`/room-types/${id}`, { method: 'DELETE' }),
+  addRoom:  (id, body) => request(`/room-types/${id}/rooms`, { method: 'POST', body: JSON.stringify(body) }),
+  getRooms: (id) => request(`/room-types/${id}/rooms`),
+};
+
+// ─── Bookings ────────────────────────────────────────────────────────────────
+export const bookingsAPI = {
+  checkAvailability: (body) => request('/bookings/check', { method: 'POST', body: JSON.stringify(body) }),
+  create:            (body) => request('/bookings', { method: 'POST', body: JSON.stringify(body) }),
+  getMyBookings:     () => request('/bookings/my'),
+  getById:           (id) => request(`/bookings/${id}`),
+  cancel:            (id, body = {}) => request(`/bookings/${id}/cancel`, { method: 'PATCH', body: JSON.stringify(body) }),
+};
+
+// ─── Payments ─────────────────────────────────────────────────────────────────
+export const paymentsAPI = {
+  initiate:     (body) => request('/payments/initiate', { method: 'POST', body: JSON.stringify(body) }),
+  confirm:      (paymentId) => request(`/payments/${paymentId}/confirm`, { method: 'POST' }),
+  getByBooking: (bookingId) => request(`/payments/booking/${bookingId}`),
+  refund:       (paymentId) => request(`/payments/${paymentId}/refund`, { method: 'POST' }),
+};
+
+// ─── Reviews ─────────────────────────────────────────────────────────────────
+export const reviewsAPI = {
+  getAll:  (hotelId, params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/hotels/${hotelId}/reviews?${qs}`);
   },
-});
+  create:  (hotelId, body) => request(`/hotels/${hotelId}/reviews`, { method: 'POST', body: JSON.stringify(body) }),
+  delete:  (hotelId, reviewId) => request(`/hotels/${hotelId}/reviews/${reviewId}`, { method: 'DELETE' }),
+};
 
-// ─── Request interceptor — attach JWT from localStorage ───────────────────────
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('yoyo_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// ─── Cities ──────────────────────────────────────────────────────────────────
+export const citiesAPI = {
+  getAll:   (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/cities?${qs}`); },
+  getStats: () => request('/cities/stats'),
+};
 
-// ─── Response interceptor — handle 401 globally ───────────────────────────────
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('yoyo_token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error.response?.data || error);
-  }
-);
+// ─── Deals ───────────────────────────────────────────────────────────────────
+export const dealsAPI = {
+  getAll:  () => request('/deals'),
+  getById: (id) => request(`/deals/${id}`),
+  create:  (body) => request('/deals', { method: 'POST', body: JSON.stringify(body) }),
+  update:  (id, body) => request(`/deals/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  delete:  (id) => request(`/deals/${id}`, { method: 'DELETE' }),
+};
 
-export default api;
+// ─── Newsletter ───────────────────────────────────────────────────────────────
+export const newsletterAPI = {
+  subscribe:      (email) => request('/newsletter/subscribe', { method: 'POST', body: JSON.stringify({ email }) }),
+  unsubscribe:    (email) => request('/newsletter/unsubscribe', { method: 'POST', body: JSON.stringify({ email }) }),
+  getSubscribers: (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/newsletter/subscribers?${qs}`); },
+};
+
+// ─── Admin ────────────────────────────────────────────────────────────────────
+export const adminAPI = {
+  getAnalytics:        () => request('/admin/analytics'),
+  getUsers:            (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/admin/users?${qs}`); },
+  getUserById:         (id) => request(`/admin/users/${id}`),
+  updateUser:          (id, body) => request(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  getAllBookings:       (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/admin/bookings?${qs}`); },
+  updateBookingStatus: (id, status) => request(`/admin/bookings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  getHotels:           (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/admin/hotels?${qs}`); },
+  getPendingHotels:    () => request('/admin/hotels/pending'),
+  createHotel:         (body) => request('/admin/hotels', { method: 'POST', body: JSON.stringify(body) }),
+  approveHotel:        (id) => request(`/admin/hotels/${id}/approve`, { method: 'PATCH' }),
+  rejectHotel:         (id, reason) => request(`/admin/hotels/${id}/reject`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
+  getReviews:          (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/admin/reviews?${qs}`); },
+  updateHotelRooms:    (hotelId, totalRooms) => request(`/admin/hotels/${hotelId}/rooms`, { method: 'PATCH', body: JSON.stringify({ totalRooms }) }),
+};
+
+// ─── Hotel Listing Submission ─────────────────────────────────────────────────
+export const listingAPI = {
+  submit: (body) => request('/hotels/submit', { method: 'POST', body: JSON.stringify(body) }),
+};
