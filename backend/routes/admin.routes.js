@@ -22,7 +22,7 @@ router.use(protect);
 router.use(authorize('hotel_admin', 'superadmin'));
 
 //  Analytics (superadmin only) 
-router.get('/analytics', authorize('superadmin'), getAnalytics);
+router.get('/analytics', getAnalytics);
 
 //  Users (superadmin only) 
 router.get('/users', authorize('superadmin'), getAllUsers);

@@ -12,6 +12,17 @@ const asyncHandler = require('../utils/asyncHandler');
 //  @route GET /api/v1/admin/analytics
 //  @access Private (superadmin)
 exports.getAnalytics = asyncHandler(async (req, res) => {
+  const isHotelAdmin = req.user.role === 'hotel_admin';
+  let hotelIds = [];
+  if (isHotelAdmin) {
+    const adminHotels = await Hotel.find({ managedBy: req.user._id }).select('_id');
+    hotelIds = adminHotels.map(h => h._id);
+  }
+
+  const hotelQuery = isHotelAdmin ? { _id: { $in: hotelIds }, isActive: true } : { isActive: true };
+  const bookingQuery = isHotelAdmin ? { hotel: { $in: hotelIds } } : {};
+  const confirmedQuery = { ...bookingQuery, status: { $in: ['confirmed', 'checked_in', 'checked_out'] } };
+
   const [
     totalUsers,
     totalHotels,
@@ -21,22 +32,22 @@ exports.getAnalytics = asyncHandler(async (req, res) => {
     recentBookings,
     topHotels,
   ] = await Promise.all([
-    User.countDocuments(),
-    Hotel.countDocuments({ isActive: true }),
-    Booking.countDocuments(),
-    Booking.countDocuments({ status: { $in: ['confirmed', 'checked_in', 'checked_out'] } }),
+    isHotelAdmin ? Promise.resolve(0) : User.countDocuments(),
+    Hotel.countDocuments(hotelQuery),
+    Booking.countDocuments(bookingQuery),
+    Booking.countDocuments(confirmedQuery),
     Booking.aggregate([
-      { $match: { status: { $in: ['confirmed', 'checked_in', 'checked_out'] } } },
+      { $match: confirmedQuery },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } },
     ]),
-    Booking.find()
+    Booking.find(bookingQuery)
       .sort({ createdAt: -1 })
       .limit(5)
       .populate('guest', 'firstName lastName email')
       .populate('hotel', 'name')
       .select('status totalAmount checkIn checkOut createdAt'),
     Booking.aggregate([
-      { $match: { status: { $in: ['confirmed', 'checked_in', 'checked_out'] } } },
+      { $match: confirmedQuery },
       { $group: { _id: '$hotel', bookingCount: { $sum: 1 }, revenue: { $sum: '$totalAmount' } } },
       { $sort: { revenue: -1 } },
       { $limit: 5 },

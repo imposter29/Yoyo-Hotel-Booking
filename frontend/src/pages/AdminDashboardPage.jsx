@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { adminAPI, hotelsAPI, dealsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 //  Shared helpers 
 const STATUS_CONFIG = {
@@ -50,6 +51,7 @@ function AdminCard({ children }) {
 
 //  Analytics 
 function AnalyticsView() {
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +66,9 @@ function AnalyticsView() {
     <div>
       <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 24 }}>Analytics Overview</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 28 }}>
-        <StatCard icon="" label="Total Users" value={ov.totalUsers} color="#3b82f6" />
+        {user?.role === 'superadmin' && (
+          <StatCard icon="" label="Total Users" value={ov.totalUsers} color="#3b82f6" />
+        )}
         <StatCard icon="" label="Active Hotels" value={ov.totalHotels} color="#8b5cf6" />
         <StatCard icon="" label="Total Bookings" value={ov.totalBookings} color="#ef4444" />
         <StatCard icon="" label="Total Revenue" value={`₹${(ov.totalRevenue || 0).toLocaleString('en-IN')}`} color="#16a34a" />
@@ -684,8 +688,11 @@ const NAV_ITEMS = [
 
 //  Main Dashboard shell 
 export default function AdminDashboardPage() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isSuperAdmin = user?.role === 'superadmin';
 
   // Redirect /admin to /admin/analytics
   useEffect(() => {
@@ -700,7 +707,7 @@ export default function AdminDashboardPage() {
       <div style={{ borderBottom: '1px solid #e5e5e5', background: 'white', position: 'sticky', top: 60, zIndex: 10 }}>
         <div className="container">
           <div style={{ display: 'flex', gap: 0, overflowX: 'auto' }}>
-            {NAV_ITEMS.map((item) => {
+            {NAV_ITEMS.filter(item => isSuperAdmin || !['Users', 'Deals'].includes(item.label)).map((item) => {
               const active = item.path === '/admin'
                 ? location.pathname === '/admin' || location.pathname === '/admin/analytics'
                 : location.pathname.startsWith(item.path);
@@ -733,8 +740,8 @@ export default function AdminDashboardPage() {
           <Route path="analytics" element={<AnalyticsView />} />
           <Route path="bookings"  element={<BookingsView />} />
           <Route path="hotels"    element={<HotelsView />} />
-          <Route path="users"     element={<UsersView />} />
-          <Route path="deals"     element={<DealsView />} />
+          <Route path="users"     element={isSuperAdmin ? <UsersView /> : <Navigate to="/admin" />} />
+          <Route path="deals"     element={isSuperAdmin ? <DealsView /> : <Navigate to="/admin" />} />
         </Routes>
       </div>
     </div>
