@@ -87,8 +87,8 @@ export default function Navbar() {
                       </Link>
                     )}
 
-                    {/* Superadmin — full dashboard */}
-                    {user.role === 'superadmin' && (
+                    {/* Admin Dashboard */}
+                    {['hotel_admin', 'superadmin'].includes(user.role) && (
                       <Link to="/admin" className="dropdown-item" role="menuitem"> Admin Dashboard</Link>
                     )}
 
