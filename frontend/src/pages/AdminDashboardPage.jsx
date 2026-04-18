@@ -196,6 +196,7 @@ function HotelsView() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState(EMPTY_HOTEL_FORM);
   const [creating, setCreating] = useState(false);
+  const [cityFilter, setCityFilter] = useState('');
   const { addToast } = useToast();
 
   const [pending, setPending] = useState([]);
@@ -256,18 +257,26 @@ function HotelsView() {
   };
 
   const fLabel = { fontSize:12, fontWeight:600, color:'#737373', display:'block', marginBottom:4 };
+  const cities = [...new Set(hotels.map(h => h.address?.city).filter(Boolean))].sort();
+  const filteredHotels = hotels.filter(h => !cityFilter || h.address?.city === cityFilter);
 
   return (
     <div>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
         <h2 style={{ fontSize:20, fontWeight:800 }}>
-          Manage Hotels <span style={{ fontSize:14, color:'#737373', fontWeight:400 }}>({hotels.length})</span>
+          Manage Hotels <span style={{ fontSize:14, color:'#737373', fontWeight:400 }}>({filteredHotels.length})</span>
         </h2>
-        <button className="btn btn-red btn-sm" id="btn-create-hotel"
-          onClick={() => setShowCreate(v => !v)}
-          style={{ display:'flex', alignItems:'center', gap:6 }}>
-          {showCreate ? 'x Cancel' : '+ Add Hotel'}
-        </button>
+        <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+          <select className="form-input" style={{ width: 160, padding: '6px 12px', minHeight: '36px' }} value={cityFilter} onChange={e => setCityFilter(e.target.value)}>
+            <option value="">All Cities</option>
+            {cities.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <button className="btn btn-red btn-sm" id="btn-create-hotel"
+            onClick={() => setShowCreate(v => !v)}
+            style={{ display:'flex', alignItems:'center', gap:6 }}>
+            {showCreate ? 'x Cancel' : '+ Add Hotel'}
+          </button>
+        </div>
       </div>
 
       {/*  Pending Approvals  */}
@@ -442,7 +451,7 @@ function HotelsView() {
           <AdminTable
             headers={['Hotel', 'City', 'Stars', 'Rating', 'Rooms', 'Status', 'Actions']}
             emptyMsg="No hotels yet. Click Add Hotel above!"
-            rows={hotels.map((h) => {
+            rows={filteredHotels.map((h) => {
               const edit = roomEdits[h._id] || { value: 5, saving: false };
               return [
                 <Link to={`/hotels/${h._id}`} style={{ fontWeight:600, color:'#0f0f0f', fontSize:13 }}>{h.name}</Link>,
