@@ -10,10 +10,11 @@ Hotels relying on static pricing models lose revenue during peak demand and occu
 
 A full-stack web application with a backend-first design:
 - **Guests/Customers** search, reserve, and manage hotel room bookings
-- **Admins** manage rooms, pricing rules, seasons, and inventory
-- **Yield Pricing Engine** computes optimal rates using composable strategies
-- **Background Schedulers** automate hold expiry, pricing recalculation, and reminders
-- **Notification System** dispatches confirmations, reminders, and cancellation alerts
+- **Hotel Admins** list and manage hotels, room types, and pricing rules
+- **Super Admins** approve hotel listings and manage all users
+- **Yield Pricing Engine** computes optimal rates using composable OOP strategies
+- **Background Schedulers** automate hold expiry via node-cron
+- **Notification System** dispatches confirmations and cancellation alerts via Observer pattern
 
 ---
 
@@ -23,28 +24,29 @@ A full-stack web application with a backend-first design:
 | # | Goal |
 |---|------|
 | G1 | Real-time room availability with per-day inventory tracking |
-| G2 | Dynamic yield pricing via composable strategy patterns |
-| G3 | Booking lifecycle state machine (HOLD → CONFIRMED → CHECKED_OUT) |
-| G4 | Rule-based pricing configuration for admins |
-| G5 | Automated background jobs (hold expiry, nightly pricing) |
+| G2 | Dynamic yield pricing via composable Strategy design pattern |
+| G3 | Booking lifecycle state machine (hold → confirmed → cancelled) |
+| G4 | Rule-based pricing configuration for hotel admins |
+| G5 | Automated background jobs (hold expiry every 5 min) |
 | G6 | Demonstrate OOP principles and design patterns in production-grade backend |
+| G7 | Role-based access control (guest / hotel_admin / superadmin) |
 
 ### In Scope
-User auth, hotel/room management, availability search, yield pricing, booking CRUD, payment abstraction, invoice generation, add-on services, background schedulers, notifications.
+User auth (JWT + RBAC), hotel/room management, availability search, yield pricing engine, booking CRUD, payment recording, background schedulers, notifications, admin approval workflow.
 
 ### Out of Scope (Milestone 1)
-OTA channel sync, mobile apps, ML demand forecasting, multi-chain management.
+OTA channel sync, mobile apps, ML demand forecasting, invoice PDF generation, Stripe/Razorpay live integration.
 
 ---
 
 ## Backend Architecture
 
 ```
-HTTP Layer        →  Express Routes + Middleware + Request Validators
+HTTP Layer        →  Express Routes + Joi Validators + Auth Middleware
 Controller Layer  →  Parse & validate request → delegate to service → return HTTP response
-Service Layer     →  Business logic, state machine, orchestration, transactions
-Repository Layer  →  Data access abstraction via Knex.js (no ORM)
-Database Layer    →  PostgreSQL (relational integrity, row-level locking)
+Service Layer     →  YieldPricingEngine, AvailabilityService, NotificationService
+Model Layer       →  Mongoose schemas (MongoDB) — User, Hotel, RoomType, Room,
+                      Booking, Payment, PricingRule, InventoryCalendar, Review
 ```
 
 ---
@@ -52,70 +54,56 @@ Database Layer    →  PostgreSQL (relational integrity, row-level locking)
 ## Key Features
 
 ### Search Availability
-- Per-room, per-day inventory via `inventory_calendar` table
-- Date-range availability queries with SQL window functions
-- Optimistic locking (`FOR UPDATE`) to prevent race conditions
+- Per-room, per-day inventory via `InventoryCalendar` collection
+- Date-range availability queries
+- Hold expiry releases inventory every 5 minutes via cron job
 
-### Dynamic Yield Pricing
-- Base rate × composable multipliers (seasonal, demand, occupancy, length-of-stay)
-- Strategies loaded from `pricing_rules` table and applied in priority order
-- Price computed fresh at booking time; stored in `booking_items` for audit trail
+### Dynamic Yield Pricing (OOP Strategy Pattern)
+```
+finalPrice = baseRate
+           × seasonMultiplier      // e.g. ×1.4 during Christmas (SeasonalPricing)
+           × demandMultiplier      // e.g. ×1.2 if demandIndex high (DemandPricing)
+           × occupancyMultiplier   // e.g. ×1.3 if >80% rooms occupied (OccupancyPricing)
+           × lengthOfStayDiscount  // e.g. ×0.9 for stays ≥7 nights (LengthOfStayDiscount)
+           × earlyBirdDiscount     // e.g. ×0.85 if booked 30+ days ahead (EarlyBirdPricing)
+           × lastMinuteDiscount    // e.g. ×0.8 if booked within 3 days (LastMinutePricing)
+```
 
 ### Booking & Reservation
 - Temporary hold (15-min TTL) created before payment
-- Atomic inventory decrement + booking insert in single DB transaction
+- Inventory decremented atomically on hold creation
 - Hold expiry job releases inventory every 5 minutes
 
 ### Payment Workflow
+- Payment record linked to booking; triggers state transition to confirmed
 - Payment abstraction layer (Stripe/Razorpay-ready)
-- Payment record linked to booking; triggers state transition to CONFIRMED
-- Webhook support for async payment status updates
 
-### Cancellation & Refund
-- `CancellationPolicy` computes refund based on hours until check-in
-- Tiered refund structure (free window → partial → no refund)
+### Cancellation
+- Booking.transitionTo() enforces valid state transitions (State pattern)
 - Inventory restored on cancellation
-
-### Inventory Management
-- `inventory_calendar`: one row per room-type per date
-- Admin can view and adjust daily availability
-- Nightly job recalculates demand index for next 30 days
-
-### Seasonal Pricing Rules
-- Admins define seasons (peak/off-peak) with date ranges and multipliers
-- Rules linked to room types with priority ordering
-- `PricingStrategyFactory` instantiates correct strategy per rule type
-
-### Pricing Strategies
-```
-finalPrice = baseRate
-           × seasonMultiplier      // e.g. 1.4 during Christmas
-           × demandMultiplier      // e.g. 1.2 if booking velocity is high
-           × occupancyMultiplier   // e.g. 1.3 if >80% rooms occupied
-           × lengthOfStayDiscount  // e.g. 0.9 for stays > 7 nights
-```
 
 ---
 
-## OOP Principles
+## OOP Principles Implemented
 
 | Principle | Application |
 |-----------|-------------|
-| **Encapsulation** | `Booking.transitionTo()` — state changes only via controlled method |
-| **Abstraction** | `PricingStrategy` interface — engine works against interface, not concrete classes |
-| **Inheritance** | `SeasonalPricing`, `DemandPricing` implement `PricingStrategy` |
-| **Polymorphism** | `engine.apply(strategy)` — each strategy computes differently via same interface |
+| **Abstraction** | `PricingStrategy` abstract base class — `YieldPricingEngine` works against the interface, never concrete classes |
+| **Inheritance** | `SeasonalPricing`, `DemandPricing`, `OccupancyPricing`, `LengthOfStayDiscount`, `EarlyBirdPricing`, `LastMinutePricing` all extend `PricingStrategy` |
+| **Polymorphism** | `strategy.apply(context)` is called on all 6 concrete types; each computes the multiplier differently |
+| **Encapsulation** | `Booking.transitionTo()` — state changes only via this controlled method; conditions are private inside each strategy class |
 
 ---
 
-## Design Patterns
+## Design Patterns Implemented
 
-| Pattern | Where Used | Justification |
-|---------|-----------|---------------|
-| **Strategy** | Yield Pricing Engine | Multiple interchangeable pricing algorithms |
-| **State** | Booking Lifecycle | Enforces valid state transitions; prevents illegal state changes |
-| **Factory** | PricingStrategyFactory | Creates strategy instances from DB-loaded rule config |
-| **Observer** | Notification System | Decouples booking events from notification dispatch via EventEmitter |
+| Pattern | File | Description |
+|---------|------|-------------|
+| **Strategy** | `PricingStrategy.js` | 6 interchangeable pricing strategies with a common `apply()` interface |
+| **Factory** | `PricingStrategyFactory.js` | Creates the right strategy class from a DB `PricingRule` document |
+| **State** | `Booking.js` (`transitionTo()`) | Enforces valid booking state transitions: hold → confirmed → cancelled |
+| **Observer** | `notificationService.js` | Node.js EventEmitter decouples booking events from email dispatch |
+| **Composition** | `YieldPricingEngine.js` | Engine composes an array of strategy objects, applying them in priority order |
 
 ---
 
@@ -125,12 +113,10 @@ finalPrice = baseRate
 |-------|-----------|
 | Runtime | Node.js 20 LTS |
 | Framework | Express.js |
-| Database | PostgreSQL 15 |
-| Query Builder | Knex.js |
-| Auth | JWT |
+| Database | MongoDB + Mongoose |
+| Auth | JWT (jsonwebtoken) |
 | Validation | Joi |
 | Scheduler | node-cron |
-| Testing | Jest + Supertest |
 | Frontend | React 18 + Vite |
 
 ---
@@ -139,22 +125,22 @@ finalPrice = baseRate
 
 | Category | Requirement |
 |----------|-------------|
-| Performance | Availability API < 200ms for 30-day range query |
-| Concurrency | Handle 100 concurrent bookings without double-booking |
-| Security | JWT on all endpoints; parameterized SQL queries |
-| Auditability | All state transitions logged with timestamp and actor |
-| Testability | > 80% unit test coverage on service layer |
-| Scalability | Stateless API; horizontally scalable behind load balancer |
+| Performance | Availability API <200ms for date range queries |
+| Concurrency | Hold expiry prevents double-booking |
+| Security | JWT on all protected endpoints; Joi schema validation |
+| Auditability | All booking state transitions logged with timestamps |
+| Scalability | Stateless JWT API; horizontally scalable |
 
 ---
 
 ## Future Enhancements
 
+- Invoice PDF generation with tax breakdown
+- Stripe/Razorpay live payment gateway integration
 - ML-based demand forecasting to replace rule-based demand index
 - OTA channel manager integration (Booking.com, Expedia)
-- Multi-currency support with live exchange rates
+- Multi-currency support
 - Loyalty points program
 - Revenue analytics dashboard (RevPAR, ADR, occupancy trends)
-- Waitlist system for sold-out dates
+- Unit test coverage >80% on service layer (Jest + Supertest)
 - GraphQL API layer
-- Microservices extraction (Pricing Engine, Notification Service)

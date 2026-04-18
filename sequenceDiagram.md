@@ -8,52 +8,85 @@ sequenceDiagram
     participant BookingController
     participant AvailabilityService
     participant YieldPricingEngine
-    participant BookingService
-    participant PaymentService
-    participant PaymentGateway
+    participant PricingStrategyFactory
+    participant PricingStrategy
     participant NotificationService
     participant DB
 
-    Customer->>BookingController: POST /api/bookings (roomTypeId, checkIn, checkOut)
-    BookingController->>BookingController: Validate JWT + Request Schema
+    Customer->>BookingController: POST /api/v1/bookings/check (roomTypeId, checkIn, checkOut)
+    BookingController->>BookingController: Validate JWT + Request Schema (Joi)
 
     BookingController->>AvailabilityService: checkAvailability(roomTypeId, checkIn, checkOut)
-    AvailabilityService->>DB: SELECT inventory FOR UPDATE (date range)
-    DB-->>AvailabilityService: inventoryRecords[]
-    AvailabilityService-->>BookingController: availableRoomId
+    AvailabilityService->>DB: Query InventoryCalendar for date range
+    DB-->>AvailabilityService: inventory records
+    AvailabilityService-->>BookingController: available: true/false
 
     BookingController->>YieldPricingEngine: computePrice(roomTypeId, checkIn, checkOut)
-    YieldPricingEngine->>DB: loadPricingRules(roomTypeId)
+
+    YieldPricingEngine->>DB: RoomType.findById(roomTypeId) → baseRate
+    DB-->>YieldPricingEngine: roomType { baseRatePerNight }
+
+    YieldPricingEngine->>DB: InventoryCalendar.findOne() → occupancy & demandIndex
+    DB-->>YieldPricingEngine: { occupancyPercent, demandIndex }
+
+    YieldPricingEngine->>DB: PricingRule.find({ roomType, isActive }) sorted by priority
     DB-->>YieldPricingEngine: pricingRules[]
-    YieldPricingEngine->>YieldPricingEngine: applySeasonalStrategy(baseRate)
-    YieldPricingEngine->>YieldPricingEngine: applyDemandStrategy(price)
-    YieldPricingEngine->>YieldPricingEngine: applyOccupancyStrategy(price)
-    YieldPricingEngine-->>BookingController: PricingResult { pricePerNight, totalPrice }
 
-    BookingController->>BookingService: createHold(guestId, roomId, pricingResult)
-    BookingService->>DB: BEGIN TRANSACTION
-    BookingService->>DB: UPDATE inventory SET available_count - 1
-    BookingService->>DB: INSERT booking (status=HOLD, holdExpiresAt=NOW+15min)
-    BookingService->>DB: COMMIT
-    BookingService-->>BookingController: holdResult { bookingId, holdExpiresAt }
-    BookingController-->>Customer: 201 Created { bookingId, status: HOLD, totalAmount }
+    Note over YieldPricingEngine, PricingStrategyFactory: Factory Pattern
+    loop For each PricingRule
+        YieldPricingEngine->>PricingStrategyFactory: create(rule)
+        PricingStrategyFactory-->>YieldPricingEngine: ConcreteStrategy instance
+    end
 
-    Customer->>BookingController: POST /api/payments (bookingId, paymentToken)
-    BookingController->>BookingController: Validate hold not expired
+    Note over YieldPricingEngine, PricingStrategy: Strategy + Polymorphism
+    loop For each loaded strategy
+        YieldPricingEngine->>PricingStrategy: strategy.apply(context)
+        PricingStrategy-->>YieldPricingEngine: multiplier (e.g. 1.4)
+    end
 
-    BookingController->>PaymentService: processPayment(bookingId, amount, token)
-    PaymentService->>PaymentGateway: POST /v1/charges { amount, source }
-    PaymentGateway-->>PaymentService: { chargeId, status: succeeded }
-    PaymentService->>DB: INSERT payment (status=COMPLETED)
-    PaymentService-->>BookingController: PaymentResult { paymentId }
+    YieldPricingEngine->>YieldPricingEngine: finalPrice = baseRate × ∏(multipliers)
+    YieldPricingEngine-->>BookingController: PricingResult { pricePerNight, totalPrice, breakdown }
 
-    BookingController->>BookingService: confirmBooking(bookingId, paymentId)
-    BookingService->>DB: UPDATE booking SET status=CONFIRMED
-    BookingService-->>BookingController: confirmedBooking
+    BookingController-->>Customer: 200 OK { available, pricing }
 
-    BookingController->>NotificationService: emit(booking.confirmed, { bookingId, guestId })
-    Note right of NotificationService: Async - non-blocking EventEmitter
-    NotificationService->>NotificationService: sendConfirmationEmail(guestEmail)
+    Customer->>BookingController: POST /api/v1/bookings (roomTypeId, checkIn, checkOut, guestCount)
+    BookingController->>AvailabilityService: reserveRoom(roomTypeId, checkIn, checkOut)
+    AvailabilityService->>DB: Find available Room + update InventoryCalendar
+    DB-->>AvailabilityService: reservedRoom
+    AvailabilityService-->>BookingController: room
 
-    BookingController-->>Customer: 200 OK { bookingId, status: CONFIRMED, invoiceId }
+    BookingController->>YieldPricingEngine: computePrice(roomTypeId, checkIn, checkOut)
+    YieldPricingEngine-->>BookingController: PricingResult
+
+    BookingController->>DB: Booking.create({ status: "hold", holdExpiresAt: NOW+15min, items[] })
+    DB-->>BookingController: booking { _id, referenceNumber }
+    BookingController-->>Customer: 201 Created { bookingId, status: hold, totalAmount }
+
+    Customer->>BookingController: POST /api/v1/payments (bookingId, paymentMethod)
+    BookingController->>DB: Validate hold not expired
+    BookingController->>DB: Payment.create({ status: completed })
+    BookingController->>DB: Booking.transitionTo("confirmed")
+
+    Note right of NotificationService: Observer Pattern — async EventEmitter
+    BookingController->>NotificationService: emit("booking.confirmed", { bookingId, guest })
+    NotificationService->>NotificationService: sendConfirmationEmail(guest.email)
+
+    BookingController-->>Customer: 200 OK { bookingId, status: confirmed }
+```
+
+## Hold Expiry Background Job
+
+```mermaid
+sequenceDiagram
+    participant HoldExpiryJob
+    participant DB
+    participant InventoryCalendar
+
+    Note over HoldExpiryJob: Runs every 5 minutes via node-cron
+    HoldExpiryJob->>DB: Find bookings { status: hold, holdExpiresAt < now }
+    DB-->>HoldExpiryJob: expiredBookings[]
+    loop For each expired booking
+        HoldExpiryJob->>DB: Booking.transitionTo("expired")
+        HoldExpiryJob->>InventoryCalendar: Restore availableCount, decrement heldCount
+    end
 ```

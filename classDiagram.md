@@ -22,10 +22,10 @@ classDiagram
     class Hotel {
         +String id
         +String name
-        +String address
-        +String city
-        +String country
+        +Object address
         +Int starRating
+        +Float averageRating
+        +Boolean isApproved
         +Boolean isActive
         +getRoomTypes() RoomType[]
         +isOperational() Boolean
@@ -38,6 +38,7 @@ classDiagram
         +Int maxOccupancy
         +Decimal baseRatePerNight
         +String[] amenities
+        +Object cancellationPolicy
         +Boolean isActive
         +getBaseRate() Decimal
         +supportsOccupancy(guests) Boolean
@@ -51,10 +52,9 @@ classDiagram
         +Int floor
         +Boolean isActive
         +isAvailable(checkIn, checkOut) Boolean
-        +deactivate() void
     }
 
-    class Inventory {
+    class InventoryCalendar {
         +String id
         +String roomTypeId
         +Date date
@@ -62,9 +62,8 @@ classDiagram
         +Int availableCount
         +Int heldCount
         +Int bookedCount
-        +decrementAvailable() void
-        +incrementAvailable() void
-        +getOccupancyRate() Float
+        +Float demandIndex
+        +getOccupancyPercent() Float
         +isAvailable() Boolean
     }
 
@@ -78,10 +77,10 @@ classDiagram
         +Int totalNights
         +Decimal totalAmount
         +DateTime holdExpiresAt
+        +Array items
         +transitionTo(newStatus) void
         +isHoldExpired() Boolean
         +canBeCancelled() Boolean
-        +calculateRefundAmount() Decimal
     }
 
     class Payment {
@@ -91,89 +90,99 @@ classDiagram
         +String currency
         +String status
         +String gatewayChargeId
-        +String paymentMethod
         +DateTime paidAt
-        +Decimal refundedAmount
         +isCompleted() Boolean
-        +processRefund(amount) void
     }
 
-    class Invoice {
+    class PricingRule {
         +String id
-        +String bookingId
-        +String paymentId
-        +String invoiceNumber
-        +Decimal subtotal
-        +Decimal taxAmount
-        +Decimal totalAmount
-        +DateTime issuedAt
-        +computeTotals() void
-        +toPDF() Buffer
-    }
-
-    class CancellationPolicy {
-        +String id
+        +String roomTypeId
+        +String hotelId
         +String name
-        +Int freeCancellationHours
-        +Object[] tiers
-        +computeRefundAmount(booking, cancelAt) Decimal
-        +isFreeCancellationWindow(cancelAt, checkIn) Boolean
-    }
-
-    class Discount {
-        +String id
-        +String code
-        +String type
-        +Decimal value
-        +Date validFrom
-        +Date validTo
-        +Int maxUses
-        +Int usedCount
-        +isValid() Boolean
-        +apply(price) Decimal
+        +String ruleType
+        +Decimal multiplier
+        +Int priority
+        +Object conditions
+        +Date effectiveFrom
+        +Date effectiveTo
+        +Boolean isActive
     }
 
     class PricingStrategy {
-        <<interface>>
-        +apply(context) Decimal
+        <<abstract>>
+        #PricingRule rule
+        +apply(context) Number
         +getName() String
         +getPriority() Int
     }
 
     class SeasonalPricing {
-        +String seasonId
-        +Decimal multiplier
-        +apply(context) Decimal
+        +apply(context) Number
         +getName() String
         +getPriority() Int
     }
 
     class DemandPricing {
-        +Float demandThreshold
-        +Decimal multiplier
-        +apply(context) Decimal
+        +apply(context) Number
         +getName() String
         +getPriority() Int
     }
 
-    class YieldPricingEngine {
-        +PricingStrategy[] strategies
-        +computePrice(roomTypeId, checkIn, checkOut) PricingResult
-        +loadStrategies(roomTypeId) void
-        +applyStrategies(baseRate, context) Decimal
+    class OccupancyPricing {
+        +apply(context) Number
+        +getName() String
+        +getPriority() Int
     }
 
-    PricingStrategy <|.. SeasonalPricing : implements
-    PricingStrategy <|.. DemandPricing : implements
-    YieldPricingEngine o-- PricingStrategy : uses
+    class LengthOfStayDiscount {
+        +apply(context) Number
+        +getName() String
+        +getPriority() Int
+    }
+
+    class EarlyBirdPricing {
+        +apply(context) Number
+        +getName() String
+        +getPriority() Int
+    }
+
+    class LastMinutePricing {
+        +apply(context) Number
+        +getName() String
+        +getPriority() Int
+    }
+
+    class PricingStrategyFactory {
+        <<static>>
+        -Map STRATEGY_MAP
+        +create(rule) PricingStrategy
+        +getSupportedTypes() String[]
+    }
+
+    class YieldPricingEngine {
+        -PricingStrategy[] strategies
+        +loadStrategies(roomTypeId, checkIn) void
+        +applyStrategies(baseRate, context) Object
+        +computePrice(roomTypeId, checkIn, checkOut) PricingResult
+    }
+
+    PricingStrategy <|-- SeasonalPricing : extends
+    PricingStrategy <|-- DemandPricing : extends
+    PricingStrategy <|-- OccupancyPricing : extends
+    PricingStrategy <|-- LengthOfStayDiscount : extends
+    PricingStrategy <|-- EarlyBirdPricing : extends
+    PricingStrategy <|-- LastMinutePricing : extends
+
+    PricingStrategyFactory ..> PricingStrategy : creates
+    YieldPricingEngine --> PricingStrategyFactory : uses
+    YieldPricingEngine o-- PricingStrategy : composes
 
     User "1" --> "0..*" Booking : places
     Hotel "1" *-- "1..*" RoomType : has
-    Hotel "1" *-- "1..*" Room : owns
-    RoomType "1" *-- "1..*" Room : contains
-    RoomType "1" *-- "0..*" Inventory : tracks
-    RoomType "0..*" --> "1" CancellationPolicy : governed by
-    Booking "1" --> "1" Payment : paid via
-    Booking "1" --> "1" Invoice : generates
-    Booking "0..*" --> "0..1" Discount : applies
+    Hotel "1" *-- "0..*" Room : owns
+    RoomType "1" *-- "0..*" Room : categorizes
+    RoomType "1" *-- "0..*" InventoryCalendar : tracks
+    RoomType "1" *-- "0..*" PricingRule : governed_by
+    Booking "1" --> "1" Payment : paid_via
+    Booking "1" *-- "1..*" BookingItem : contains
 ```

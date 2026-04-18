@@ -6,180 +6,185 @@
 erDiagram
 
 USERS {
-    string id PK
+    ObjectId id PK
     string email
-    string password_hash
-    string first_name
-    string last_name
+    string passwordHash
+    string firstName
+    string lastName
     string phone
-    string role
-    boolean is_active
-    datetime created_at
-    datetime updated_at
+    string role "guest | hotel_admin | superadmin"
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
 }
 
 HOTELS {
-    string id PK
+    ObjectId id PK
+    ObjectId managedBy FK
     string name
-    string address
-    string city
-    string country
-    int star_rating
-    string contact_email
-    boolean is_active
-    datetime created_at
+    object address "city, state, country, pincode"
+    int starRating
+    float averageRating
+    int reviewCount
+    string[] amenities
+    object[] images "url, caption, isPrimary"
+    string contactEmail
+    string contactPhone
+    boolean isApproved
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
 }
 
 ROOM_TYPES {
-    string id PK
-    string hotel_id FK
-    string cancellation_policy_id FK
+    ObjectId id PK
+    ObjectId hotel FK
     string name
-    int max_occupancy
-    decimal base_rate_per_night
-    json amenities
-    boolean is_active
-    datetime created_at
+    string description
+    int maxOccupancy
+    decimal baseRatePerNight
+    string currency
+    string[] amenities
+    object[] bedConfiguration "bedType, count"
+    object[] images "url, caption"
+    object cancellationPolicy "freeCancellationHours, tiers[]"
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
 }
 
 ROOMS {
-    string id PK
-    string hotel_id FK
-    string room_type_id FK
-    string room_number
+    ObjectId id PK
+    ObjectId hotel FK
+    ObjectId roomType FK
+    string roomNumber
     int floor
-    boolean is_active
-    datetime created_at
+    boolean isActive
+    datetime createdAt
 }
 
 INVENTORY_CALENDAR {
-    string id PK
-    string room_type_id FK
+    ObjectId id PK
+    ObjectId roomType FK
+    ObjectId hotel FK
     date date
-    int total_rooms
-    int available_count
-    int held_count
-    int booked_count
-    datetime updated_at
-}
-
-SEASONS {
-    string id PK
-    string hotel_id FK
-    string name
-    date start_date
-    date end_date
-    string season_type
-    boolean is_recurring
-    datetime created_at
+    int totalRooms
+    int availableCount
+    int heldCount
+    int bookedCount
+    float demandIndex "0-1 updated by nightly cron"
+    datetime updatedAt
 }
 
 PRICING_RULES {
-    string id PK
-    string room_type_id FK
-    string season_id FK
-    string rule_type
+    ObjectId id PK
+    ObjectId roomType FK
+    ObjectId hotel FK
+    string name
+    string ruleType "seasonal | demand | occupancy | length_of_stay | early_bird | last_minute"
     decimal multiplier
     int priority
-    json conditions
-    date effective_from
-    date effective_to
-    boolean is_active
-    datetime created_at
+    object conditions "startDate, endDate, minDemandIndex, minOccupancyPercent, minNights, etc."
+    date effectiveFrom
+    date effectiveTo
+    boolean isActive
+    datetime createdAt
+    datetime updatedAt
 }
 
 BOOKINGS {
-    string id PK
-    string guest_id FK
-    string hotel_id FK
-    string status
-    date check_in
-    date check_out
-    int total_nights
-    decimal total_amount
-    decimal refund_amount
-    datetime hold_expires_at
-    datetime confirmed_at
-    datetime cancelled_at
-    datetime created_at
-    datetime updated_at
-}
-
-BOOKING_ITEMS {
-    string id PK
-    string booking_id FK
-    string room_id FK
-    string room_type_id FK
-    date check_in
-    date check_out
-    int nights
-    decimal base_price_per_night
-    decimal final_price_per_night
-    decimal total_price
-    json pricing_breakdown
-    datetime created_at
+    ObjectId id PK
+    ObjectId guest FK
+    ObjectId hotel FK
+    string status "hold | confirmed | checked_in | checked_out | cancelled | expired"
+    date checkIn
+    date checkOut
+    int totalNights
+    int guestCount
+    decimal totalAmount
+    string currency
+    string referenceNumber
+    string guestRequests
+    string cancellationReason
+    datetime holdExpiresAt
+    datetime confirmedAt
+    datetime cancelledAt
+    object[] items "room, roomType, nights, basePricePerNight, finalPricePerNight, pricingBreakdown"
+    datetime createdAt
+    datetime updatedAt
 }
 
 PAYMENTS {
-    string id PK
-    string booking_id FK
+    ObjectId id PK
+    ObjectId booking FK
+    ObjectId guest FK
     decimal amount
     string currency
-    string status
-    string gateway_charge_id
-    string gateway_provider
-    string payment_method
-    decimal refunded_amount
-    datetime paid_at
-    datetime refunded_at
-    datetime created_at
+    string status "pending | completed | failed | refunded"
+    string gatewayChargeId
+    string gatewayProvider
+    string paymentMethod
+    decimal refundedAmount
+    datetime paidAt
+    datetime refundedAt
+    datetime createdAt
 }
 
-INVOICES {
-    string id PK
-    string booking_id FK
-    string payment_id FK
-    string invoice_number
-    string guest_name
-    string guest_email
-    json line_items
-    decimal subtotal
-    decimal tax_rate
-    decimal tax_amount
-    decimal total_amount
-    datetime issued_at
-    datetime created_at
+REVIEWS {
+    ObjectId id PK
+    ObjectId hotel FK
+    ObjectId guest FK
+    ObjectId booking FK
+    int rating "1-5"
+    string title
+    string comment
+    datetime createdAt
 }
 
-CANCELLATION_POLICIES {
-    string id PK
-    string name
+DEALS {
+    ObjectId id PK
+    ObjectId hotel FK
+    string title
     string description
-    int free_cancellation_hours
-    json tiers
-    datetime created_at
+    decimal discountPercent
+    date validFrom
+    date validTo
+    boolean isActive
 }
+
+CITIES {
+    ObjectId id PK
+    string name
+    string country
+    string imageUrl
+    boolean isPopular
+}
+
+NEWSLETTER {
+    ObjectId id PK
+    string email
+    datetime subscribedAt
+}
+
+USERS ||--o{ HOTELS : manages
+USERS ||--o{ BOOKINGS : places
+USERS ||--o{ REVIEWS : writes
+USERS ||--o{ PAYMENTS : makes
 
 HOTELS ||--o{ ROOM_TYPES : has
 HOTELS ||--o{ ROOMS : contains
-HOTELS ||--o{ SEASONS : defines
+HOTELS ||--o{ PRICING_RULES : defines
+HOTELS ||--o{ REVIEWS : receives
+HOTELS ||--o{ DEALS : offers
+HOTELS ||--o{ INVENTORY_CALENDAR : tracks
 
 ROOM_TYPES ||--o{ ROOMS : categorizes
-ROOM_TYPES ||--o{ INVENTORY_CALENDAR : tracks
 ROOM_TYPES ||--o{ PRICING_RULES : governed_by
-ROOM_TYPES }o--|| CANCELLATION_POLICIES : uses
-
-SEASONS ||--o{ PRICING_RULES : referenced_by
-
-USERS ||--o{ BOOKINGS : places
-HOTELS ||--o{ BOOKINGS : hosts
+ROOM_TYPES ||--o{ INVENTORY_CALENDAR : per_date
 
 BOOKINGS ||--|{ BOOKING_ITEMS : contains
 BOOKINGS ||--o| PAYMENTS : paid_via
-BOOKINGS ||--o| INVOICES : generates
+BOOKINGS ||--o{ REVIEWS : linked_to
 
-BOOKING_ITEMS }o--|| ROOMS : reserves
-BOOKING_ITEMS }o--|| ROOM_TYPES : of_type
-
-PAYMENTS ||--o| INVOICES : linked_to
+ROOMS }o--|| ROOM_TYPES : belongs_to
 ```
