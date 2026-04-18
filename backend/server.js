@@ -23,6 +23,10 @@ const adminRoutes     = require('./routes/admin.routes');
 
 const app = express();
 
+// ─── Trust proxy (required on Render / Heroku / any reverse proxy) ────────────
+// Fixes: ERR_ERL_UNEXPECTED_X_FORWARDED_FOR from express-rate-limit
+app.set('trust proxy', 1);
+
 // ─── Database ─────────────────────────────────────────────────────────────────
 connectDB();
 
