@@ -293,7 +293,7 @@ function HotelsView() {
               rows={pending.map(h => [
                 <span style={{ fontWeight:600, fontSize:13 }}>{h.name}</span>,
                 h.address?.city,
-                (h.starRating || 3) + ' star',
+                '⭐'.repeat(h.starRating || 3),
                 h.managedBy ? h.managedBy.firstName + ' ' + h.managedBy.lastName + ' (' + h.managedBy.email + ')' : '-',
                 new Date(h.createdAt).toLocaleDateString(),
                 <div style={{ display:'flex', gap:8 }}>
@@ -378,7 +378,7 @@ function HotelsView() {
               <div>
                 <label style={fLabel}>Star Rating</label>
                 <select className="form-input" value={form.starRating} onChange={e => setF('starRating', Number(e.target.value))}>
-                  {[1,2,3,4,5].map(s => <option key={s} value={s}>{'x'.repeat(s).split('').map(()=>'*').join('')} {s} Star{s>1?'s':''}</option>)}
+                  {[1,2,3,4,5].map(s => <option key={s} value={s}>{'⭐'.repeat(s)} {s} Star{s>1?'s':''}</option>)}
                 </select>
               </div>
               <div>

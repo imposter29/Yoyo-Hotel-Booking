@@ -73,6 +73,7 @@ export default function ListHotelPage() {
       className="form-input"
       value={form[key]}
       onChange={e => set(key, type === 'checkbox' ? e.target.checked : e.target.value)}
+      required
       {...extra}
     />
   );
@@ -124,35 +125,35 @@ export default function ListHotelPage() {
                     {inp('city')}
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>State</label>
+                    <label style={stepLabel}>State *</label>
                     {inp('state')}
                   </div>
                   <div className="list-field full">
-                    <label style={stepLabel}>Street Address</label>
+                    <label style={stepLabel}>Street Address *</label>
                     {inp('street')}
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Country</label>
+                    <label style={stepLabel}>Country *</label>
                     {inp('country')}
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Postal Code</label>
+                    <label style={stepLabel}>Postal Code *</label>
                     {inp('postalCode')}
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Contact Email</label>
+                    <label style={stepLabel}>Contact Email *</label>
                     {inp('contactEmail', 'email')}
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Contact Phone</label>
+                    <label style={stepLabel}>Contact Phone *</label>
                     {inp('contactPhone', 'tel')}
                   </div>
                   <div className="list-field full">
-                    <label style={stepLabel}>Description</label>
+                    <label style={stepLabel}>Description *</label>
                     <textarea className="form-input" rows={3} value={form.description}
                       onChange={e => set('description', e.target.value)}
                       placeholder="Describe your property — location, ambiance, nearby attractions…"
-                      style={{ resize: 'vertical', minHeight: 80 }} />
+                      style={{ resize: 'vertical', minHeight: 80 }} required />
                   </div>
                   <div className="list-field full">
                     <label style={stepLabel}>Star Rating</label>
@@ -160,7 +161,7 @@ export default function ListHotelPage() {
                       {[1, 2, 3, 4, 5].map(s => (
                         <button key={s} type="button"
                           className={`star-btn ${form.starRating >= s ? 'active' : ''}`}
-                          onClick={() => set('starRating', s)}></button>
+                          onClick={() => set('starRating', s)}>⭐</button>
                       ))}
                       <span className="star-label">{form.starRating} Star{form.starRating > 1 ? 's' : ''}</span>
                     </div>
@@ -186,14 +187,14 @@ export default function ListHotelPage() {
                       value={form.pricePerNight} onChange={e => set('pricePerNight', e.target.value)} required />
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Max Occupancy (per room)</label>
+                    <label style={stepLabel}>Max Occupancy (per room) *</label>
                     <input type="number" min={1} max={10} className="form-input" value={form.maxOccupancy}
-                      onChange={e => set('maxOccupancy', Number(e.target.value))} />
+                      onChange={e => set('maxOccupancy', Number(e.target.value))} required />
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Total Rooms</label>
+                    <label style={stepLabel}>Total Rooms *</label>
                     <input type="number" min={1} max={100} className="form-input" value={form.totalRooms}
-                      onChange={e => set('totalRooms', Number(e.target.value))} />
+                      onChange={e => set('totalRooms', Number(e.target.value))} required />
                   </div>
 
                   <div className="list-field full">
@@ -226,11 +227,11 @@ export default function ListHotelPage() {
                 <h3 className="list-section-title">Policies</h3>
                 <div className="list-grid">
                   <div className="list-field">
-                    <label style={stepLabel}>Check-in Time</label>
+                    <label style={stepLabel}>Check-in Time *</label>
                     {inp('checkInTime')}
                   </div>
                   <div className="list-field">
-                    <label style={stepLabel}>Check-out Time</label>
+                    <label style={stepLabel}>Check-out Time *</label>
                     {inp('checkOutTime')}
                   </div>
                   <div className="list-field full">
@@ -253,7 +254,7 @@ export default function ListHotelPage() {
                   <div className="list-review-grid">
                     <span>Hotel</span><strong>{form.name || '—'}</strong>
                     <span>City</span><strong>{form.city || '—'}</strong>
-                    <span>Stars</span><strong>{''.repeat(form.starRating)}</strong>
+                    <span>Stars</span><strong>{'⭐'.repeat(form.starRating)}</strong>
                     <span>Price/Night</span><strong>{form.pricePerNight ? `₹${form.pricePerNight}` : '—'}</strong>
                     <span>Rooms</span><strong>{form.totalRooms}</strong>
                     <span>Amenities</span><strong>{form.amenities.join(', ') || 'None'}</strong>

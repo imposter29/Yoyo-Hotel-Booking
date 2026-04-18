@@ -234,12 +234,25 @@ exports.getAdminHotels = asyncHandler(async (req, res) => {
     Hotel.countDocuments(query),
   ]);
 
+  const hotelIds = hotels.map(h => h._id);
+  const roomTypeAgg = await RoomType.aggregate([
+    { $match: { hotel: { $in: hotelIds } } },
+    { $group: { _id: '$hotel', startingFrom: { $min: '$baseRatePerNight' } } },
+  ]);
+  const priceMap = {};
+  roomTypeAgg.forEach(r => { priceMap[r._id.toString()] = r.startingFrom; });
+
+  const hotelsWithPrice = hotels.map(h => ({
+    ...h.toObject(),
+    startingFrom: priceMap[h._id.toString()] ?? null,
+  }));
+
   res.status(200).json({
     success: true,
     total,
     page: Number(page),
     pages: Math.ceil(total / Number(limit)),
-    data: { hotels },
+    data: { hotels: hotelsWithPrice },
   });
 });
 
