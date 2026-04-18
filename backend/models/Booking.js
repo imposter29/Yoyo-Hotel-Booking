@@ -162,6 +162,5 @@ bookingSchema.methods.transitionTo = function (newStatus) {
 //  Indexes 
 bookingSchema.index({ guest: 1, status: 1 });
 bookingSchema.index({ hotel: 1, status: 1 });
-bookingSchema.index({ holdExpiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL auto-delete
 
 module.exports = mongoose.model('Booking', bookingSchema);
