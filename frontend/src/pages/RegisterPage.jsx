@@ -42,6 +42,11 @@ export default function RegisterPage() {
 
   const handleChange = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
 
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 15);
+    setForm(f => ({ ...f, phone: val }));
+  };
+
   return (
     <div className="auth-page" id="register-page">
       <div className="auth-card">
@@ -113,8 +118,8 @@ export default function RegisterPage() {
           </div>
           <div className="form-group">
             <label htmlFor="reg-phone" className="form-label">Phone Number</label>
-            <input id="reg-phone" type="tel" className="form-input" placeholder="+91 98765 43210"
-              value={form.phone} onChange={handleChange('phone')} autoComplete="tel" />
+            <input id="reg-phone" type="tel" className="form-input" placeholder="e.g. 9876543210"
+              value={form.phone} onChange={handlePhoneChange} autoComplete="tel" />
           </div>
           <div className="form-group">
             <label htmlFor="reg-password" className="form-label">Password</label>

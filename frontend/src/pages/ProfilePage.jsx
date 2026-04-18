@@ -39,6 +39,11 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 15);
+    setProfileForm(f => ({ ...f, phone: val }));
+  };
+
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (pwForm.newPassword !== pwForm.confirmPassword) {
@@ -99,7 +104,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label style={{ fontSize: 12, fontWeight: 700, color: '#737373', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Phone</label>
-                <input className="form-input" value={profileForm.phone} onChange={(e) => setProfileForm((f) => ({ ...f, phone: e.target.value }))} id="profile-phone" placeholder="+91 98765 43210" />
+                <input className="form-input" type="tel" value={profileForm.phone} onChange={handlePhoneChange} id="profile-phone" placeholder="e.g. 9876543210" />
               </div>
               <button type="submit" className="btn btn-primary" disabled={profileLoading} id="btn-save-profile" style={{ alignSelf: 'flex-start' }}>
                 {profileLoading ? 'Saving...' : 'Save Changes'}
