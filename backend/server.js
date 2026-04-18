@@ -31,8 +31,8 @@ app.set('trust proxy', 1);
 connectDB();
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-// CLIENT_URL can be a comma-separated list, e.g.:
-//   http://localhost:5173,https://yoyo-hotel.vercel.app
+// CLIENT_URL can be a comma-separated list of exact origins.
+// Vercel preview URLs are also auto-allowed via regex.
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .split(',')
   .map(o => o.trim());
@@ -40,8 +40,13 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (curl, Postman, server-to-server)
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      // No origin = curl / Postman / server-to-server → allow
+      if (!origin) return callback(null, true);
+      // Exact match against CLIENT_URL list
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow all Vercel preview + production URLs for this project
+      if (/https:\/\/yoyo-hotel-booking.*\.vercel\.app$/.test(origin)) return callback(null, true);
+      if (/https:\/\/.*imposter29s-projects\.vercel\.app$/.test(origin)) return callback(null, true);
       callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
