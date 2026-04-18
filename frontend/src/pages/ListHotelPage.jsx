@@ -161,7 +161,7 @@ export default function ListHotelPage() {
                       {[1, 2, 3, 4, 5].map(s => (
                         <button key={s} type="button"
                           className={`star-btn ${form.starRating >= s ? 'active' : ''}`}
-                          onClick={() => set('starRating', s)}>⭐</button>
+                          onClick={() => set('starRating', s)}>★</button>
                       ))}
                       <span className="star-label">{form.starRating} Star{form.starRating > 1 ? 's' : ''}</span>
                     </div>
@@ -254,7 +254,7 @@ export default function ListHotelPage() {
                   <div className="list-review-grid">
                     <span>Hotel</span><strong>{form.name || '—'}</strong>
                     <span>City</span><strong>{form.city || '—'}</strong>
-                    <span>Stars</span><strong>{'⭐'.repeat(form.starRating)}</strong>
+                    <span>Stars</span><strong>{'★'.repeat(form.starRating)}</strong>
                     <span>Price/Night</span><strong>{form.pricePerNight ? `₹${form.pricePerNight}` : '—'}</strong>
                     <span>Rooms</span><strong>{form.totalRooms}</strong>
                     <span>Amenities</span><strong>{form.amenities.join(', ') || 'None'}</strong>

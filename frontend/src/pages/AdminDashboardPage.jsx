@@ -196,6 +196,7 @@ function HotelsView() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState(EMPTY_HOTEL_FORM);
   const [creating, setCreating] = useState(false);
+  const [editingHotelId, setEditingHotelId] = useState(null);
   const [cityFilter, setCityFilter] = useState('');
   const { addToast } = useToast();
 
@@ -246,14 +247,42 @@ function HotelsView() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.city || !form.pricePerNight) { addToast('Name, city and price required.', 'error'); return; }
+    if (!form.name || !form.city) { addToast('Name and city are required.', 'error'); return; }
+    if (!editingHotelId && !form.pricePerNight) { addToast('Price per night is required for new hotels.', 'error'); return; }
     setCreating(true);
     try {
-      const res = await adminAPI.createHotel({ ...form, pricePerNight: Number(form.pricePerNight) });
-      addToast(`Hotel ${res.data.hotel.name} created with ${res.data.roomsCreated} rooms!`, 'success');
-      setShowCreate(false); setForm(EMPTY_HOTEL_FORM); loadHotels();
-    } catch (err) { addToast(err.message || 'Failed to create hotel.', 'error'); }
+      if (editingHotelId) {
+        await hotelsAPI.update(editingHotelId, {
+          name: form.name,
+          description: form.description,
+          address: { street: form.street, city: form.city, state: form.state, country: form.country, postalCode: form.postalCode },
+          starRating: form.starRating,
+          amenities: form.amenities,
+          policies: { checkInTime: form.checkInTime, checkOutTime: form.checkOutTime, petFriendly: form.petFriendly, smokingAllowed: form.smokingAllowed }
+        });
+        addToast('Hotel updated successfully.', 'success');
+      } else {
+        const res = await adminAPI.createHotel({ ...form, pricePerNight: Number(form.pricePerNight) });
+        addToast(`Hotel ${res.data.hotel.name} created!`, 'success');
+      }
+      setShowCreate(false); setEditingHotelId(null); setForm(EMPTY_HOTEL_FORM); loadHotels();
+    } catch (err) { addToast(err.message || 'Failed.', 'error'); }
     finally { setCreating(false); }
+  };
+
+  const handleEditClick = (h) => {
+    setEditingHotelId(h._id);
+    setForm({
+      name: h.name, city: h.address?.city || '', state: h.address?.state || '',
+      street: h.address?.street || '', country: h.address?.country || 'India',
+      postalCode: h.address?.postalCode || '', starRating: h.starRating || 3,
+      description: h.description || '', pricePerNight: '', maxOccupancy: 2,
+      totalRooms: 5, inventoryDays: 90, checkInTime: h.policies?.checkInTime || '14:00',
+      checkOutTime: h.policies?.checkOutTime || '11:00', petFriendly: h.policies?.petFriendly || false,
+      smokingAllowed: h.policies?.smokingAllowed || false, amenities: h.amenities || [],
+    });
+    setShowCreate(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const fLabel = { fontSize:12, fontWeight:600, color:'#737373', display:'block', marginBottom:4 };
@@ -272,7 +301,7 @@ function HotelsView() {
             {cities.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <button className="btn btn-red btn-sm" id="btn-create-hotel"
-            onClick={() => setShowCreate(v => !v)}
+            onClick={() => { setShowCreate(v => !v); setEditingHotelId(null); setForm(EMPTY_HOTEL_FORM); }}
             style={{ display:'flex', alignItems:'center', gap:6 }}>
             {showCreate ? 'x Cancel' : '+ Add Hotel'}
           </button>
@@ -293,7 +322,7 @@ function HotelsView() {
               rows={pending.map(h => [
                 <span style={{ fontWeight:600, fontSize:13 }}>{h.name}</span>,
                 h.address?.city,
-                '⭐'.repeat(h.starRating || 3),
+                '★'.repeat(h.starRating || 3),
                 h.managedBy ? h.managedBy.firstName + ' ' + h.managedBy.lastName + ' (' + h.managedBy.email + ')' : '-',
                 new Date(h.createdAt).toLocaleDateString(),
                 <div style={{ display:'flex', gap:8 }}>
@@ -347,7 +376,7 @@ function HotelsView() {
 
       {showCreate && (
         <AdminCard>
-          <h3 style={{ fontSize:16, fontWeight:700, marginBottom:20 }}>Create New Hotel</h3>
+          <h3 style={{ fontSize:16, fontWeight:700, marginBottom:20 }}>{editingHotelId ? 'Edit Hotel Details' : 'Create New Hotel'}</h3>
           <form onSubmit={handleCreate}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
               <div style={{ gridColumn:'1 / -1' }}>
@@ -378,34 +407,38 @@ function HotelsView() {
               <div>
                 <label style={fLabel}>Star Rating</label>
                 <select className="form-input" value={form.starRating} onChange={e => setF('starRating', Number(e.target.value))}>
-                  {[1,2,3,4,5].map(s => <option key={s} value={s}>{'⭐'.repeat(s)} {s} Star{s>1?'s':''}</option>)}
+                  {[1,2,3,4,5].map(s => <option key={s} value={s}>{'★'.repeat(s)} {s} Star{s>1?'s':''}</option>)}
                 </select>
               </div>
-              <div>
-                <label style={fLabel}>Price / Night (Rs.) *</label>
-                <input type="number" min={1} className="form-input" placeholder="e.g. 2500"
-                  value={form.pricePerNight} onChange={e => setF('pricePerNight', e.target.value)} required />
-              </div>
-              <div>
-                <label style={fLabel}>Max Occupancy</label>
-                <input type="number" min={1} max={10} className="form-input" value={form.maxOccupancy}
-                  onChange={e => setF('maxOccupancy', Number(e.target.value))} />
-              </div>
-              <div>
-                <label style={fLabel}>Total Rooms</label>
-                <input type="number" min={1} max={100} className="form-input" value={form.totalRooms}
-                  onChange={e => setF('totalRooms', Number(e.target.value))} />
-              </div>
+              {!editingHotelId && (
+                <>
+                  <div>
+                    <label style={fLabel}>Price / Night (Rs.) *</label>
+                    <input type="number" min={1} className="form-input" placeholder="e.g. 2500"
+                      value={form.pricePerNight} onChange={e => setF('pricePerNight', e.target.value)} required />
+                  </div>
+                  <div>
+                    <label style={fLabel}>Max Occupancy</label>
+                    <input type="number" min={1} max={10} className="form-input" value={form.maxOccupancy}
+                      onChange={e => setF('maxOccupancy', Number(e.target.value))} />
+                  </div>
+                  <div>
+                    <label style={fLabel}>Total Rooms</label>
+                    <input type="number" min={1} max={100} className="form-input" value={form.totalRooms}
+                      onChange={e => setF('totalRooms', Number(e.target.value))} />
+                  </div>
+                  <div>
+                    <label style={fLabel}>Inventory Days</label>
+                    <input type="number" min={30} max={365} className="form-input" value={form.inventoryDays}
+                      onChange={e => setF('inventoryDays', Number(e.target.value))} />
+                  </div>
+                </>
+              )}
               <div><label style={fLabel}>Check-in Time</label>
                 <input className="form-input" value={form.checkInTime} onChange={e => setF('checkInTime', e.target.value)} />
               </div>
               <div><label style={fLabel}>Check-out Time</label>
                 <input className="form-input" value={form.checkOutTime} onChange={e => setF('checkOutTime', e.target.value)} />
-              </div>
-              <div>
-                <label style={fLabel}>Inventory Days</label>
-                <input type="number" min={30} max={365} className="form-input" value={form.inventoryDays}
-                  onChange={e => setF('inventoryDays', Number(e.target.value))} />
               </div>
               <div>
                 <label style={fLabel}>Policies</label>
@@ -436,9 +469,9 @@ function HotelsView() {
                 </div>
               </div>
               <div style={{ gridColumn:'1 / -1', display:'flex', gap:10, justifyContent:'flex-end', paddingTop:12, borderTop:'1px solid #f0f0f0' }}>
-                <button type="button" className="btn btn-outline btn-sm" onClick={() => { setShowCreate(false); setForm(EMPTY_HOTEL_FORM); }}>Cancel</button>
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => { setShowCreate(false); setEditingHotelId(null); setForm(EMPTY_HOTEL_FORM); }}>Cancel</button>
                 <button type="submit" className="btn btn-primary" id="btn-submit-hotel" disabled={creating}>
-                  {creating ? 'Creating...' : 'Create Hotel'}
+                  {creating ? 'Saving...' : editingHotelId ? 'Update Hotel' : 'Create Hotel'}
                 </button>
               </div>
             </div>
@@ -456,7 +489,7 @@ function HotelsView() {
               return [
                 <Link to={`/hotels/${h._id}`} style={{ fontWeight:600, color:'#0f0f0f', fontSize:13 }}>{h.name}</Link>,
                 h.address?.city,
-                (h.starRating || 3) + ' star',
+                '★'.repeat(h.starRating || 3),
                 h.averageRating > 0 ? h.averageRating.toFixed(1) : '-',
                 <div style={{ display:'flex', alignItems:'center', gap:6 }}>
                   <input type="number" min={1} max={500} value={edit.value}
@@ -468,9 +501,12 @@ function HotelsView() {
                   </button>
                 </div>,
                 <span className={`badge ${h.isActive ? 'badge-green' : 'badge-red'}`}>{h.isActive ? 'Active' : 'Inactive'}</span>,
-                <button className={`btn btn-sm ${h.isActive ? 'btn-outline' : 'btn-primary'}`} onClick={() => toggleActive(h)} style={{ fontSize:12 }}>
-                  {h.isActive ? 'Deactivate' : 'Activate'}
-                </button>,
+                <div style={{ display:'flex', gap:6 }}>
+                  <button className="btn btn-sm btn-outline" onClick={() => handleEditClick(h)} style={{ fontSize:12 }}>Edit</button>
+                  <button className={`btn btn-sm ${h.isActive ? 'btn-outline' : 'btn-primary'}`} onClick={() => toggleActive(h)} style={{ fontSize:12 }}>
+                    {h.isActive ? 'Deactivate' : 'Activate'}
+                  </button>
+                </div>,
               ];
             })}
           />
