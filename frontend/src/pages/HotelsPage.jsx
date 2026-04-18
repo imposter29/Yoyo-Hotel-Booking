@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { hotelsAPI } from '../services/api';
 import Footer from '../components/common/Footer';
+import { getHotelImage } from '../utils/images';
 import './HotelsPage.css';
 
 function SkeletonCard() {
@@ -20,7 +21,7 @@ function SkeletonCard() {
 
 function HotelCard({ hotel }) {
   const navigate = useNavigate();
-  const primaryImg = hotel.images?.find(i => i.isPrimary)?.url || hotel.images?.[0]?.url;
+  const primaryImg = getHotelImage(hotel._id);
   const ratingStars = Math.round(hotel.averageRating || 0);
   const stars = Array.from({ length: 5 }, (_, i) => (
     <span key={i} className={`star${i < ratingStars ? '' : ' empty'}`}></span>

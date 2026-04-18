@@ -4,6 +4,7 @@ import { hotelsAPI, roomTypesAPI, reviewsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Footer from '../components/common/Footer';
+import { getHotelImage, getRoomImage } from '../utils/images';
 import './HotelDetailPage.css';
 
 function StarRating({ count, interactive = false, value = 0, onChange }) {
@@ -44,7 +45,7 @@ function ReviewCard({ review }) {
 }
 
 function RoomTypeCard({ rt, onBook }) {
-  const primaryImg = rt.images?.[0]?.url;
+  const primaryImg = getRoomImage(rt._id);
   return (
     <div style={{ border: '1.5px solid #e5e5e5', borderRadius: 14, overflow: 'hidden', display: 'flex', gap: 0, background: 'white', marginBottom: 16, transition: 'box-shadow 0.2s' }}
       onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'}
@@ -173,7 +174,7 @@ export default function HotelDetailPage() {
     </div>
   );
 
-  const images = hotel.images || [];
+  const images = hotel.images?.length ? hotel.images : [{ url: getHotelImage(hotel._id) }];
   const lowestPrice = roomTypes.length > 0
     ? Math.min(...roomTypes.map(rt => rt.baseRatePerNight))
     : null;
