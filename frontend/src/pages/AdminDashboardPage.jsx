@@ -184,9 +184,18 @@ function BookingsView() {
 }
 
 //  Hotels 
+const INDIAN_STATES = [
+  'Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar',
+  'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
+  'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
+];
 const AMENITY_OPTIONS = ['wifi','ac','parking','pool','gym','spa','restaurant','bar','elevator','laundry','roomService','conferenceRoom'];
 const EMPTY_HOTEL_FORM = {
   name:'', city:'', state:'', street:'', country:'India', postalCode:'',
+  contactEmail:'', contactPhone:'',
   starRating:3, description:'', pricePerNight:'',
   maxOccupancy:2, totalRooms:5, inventoryDays:90,
   checkInTime:'14:00', checkOutTime:'11:00',
@@ -234,6 +243,27 @@ function HotelsView() {
   const toggleAmenity = (a) => setForm(f => ({
     ...f, amenities: f.amenities.includes(a) ? f.amenities.filter(x => x !== a) : [...f.amenities, a],
   }));
+
+  const handlePostalCodeChange = async (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setF('postalCode', val);
+    if (val.length === 6) {
+      try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${val}`);
+        const data = await res.json();
+        if (data && data[0] && data[0].Status === 'Success') {
+          const po = data[0].PostOffice[0];
+          setForm(f => ({ ...f, postalCode: val, city: po.District, state: po.State }));
+          addToast('City and state autofilled based on postal code.', 'success');
+        }
+      } catch (err) { /* ignore */ }
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 15);
+    setF('contactPhone', val);
+  };
 
   const toggleActive = async (hotel) => {
     try {
@@ -402,8 +432,11 @@ function HotelsView() {
               <div><label style={fLabel}>City *</label>
                 <input className="form-input" value={form.city} onChange={e => setF('city', e.target.value)} required />
               </div>
-              <div><label style={fLabel}>State</label>
-                <input className="form-input" value={form.state} onChange={e => setF('state', e.target.value)} />
+              <div><label style={fLabel}>State *</label>
+                <select className="form-input" value={form.state} onChange={e => setF('state', e.target.value)} required>
+                  <option value="" disabled>Select State</option>
+                  {INDIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
+                </select>
               </div>
               <div style={{ gridColumn:'1 / -1' }}><label style={fLabel}>Street Address</label>
                 <input className="form-input" value={form.street} onChange={e => setF('street', e.target.value)} />
@@ -412,7 +445,13 @@ function HotelsView() {
                 <input className="form-input" value={form.country} onChange={e => setF('country', e.target.value)} />
               </div>
               <div><label style={fLabel}>Postal Code</label>
-                <input className="form-input" value={form.postalCode} onChange={e => setF('postalCode', e.target.value)} />
+                <input className="form-input" type="text" pattern="[0-9]{6}" value={form.postalCode} onChange={handlePostalCodeChange} />
+              </div>
+              <div><label style={fLabel}>Contact Email</label>
+                <input className="form-input" type="email" value={form.contactEmail || ''} onChange={e => setF('contactEmail', e.target.value)} />
+              </div>
+              <div><label style={fLabel}>Contact Phone</label>
+                <input className="form-input" type="tel" value={form.contactPhone || ''} onChange={handlePhoneChange} placeholder="e.g. 9876543210" />
               </div>
               <div style={{ gridColumn:'1 / -1' }}><label style={fLabel}>Description</label>
                 <textarea className="form-input" rows={2} value={form.description}

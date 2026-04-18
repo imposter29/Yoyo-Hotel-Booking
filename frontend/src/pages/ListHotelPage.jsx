@@ -9,6 +9,16 @@ const AMENITIES = [
   'restaurant', 'bar', 'elevator', 'laundry', 'roomService', 'conferenceRoom',
 ];
 
+const INDIAN_STATES = [
+  'Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar',
+  'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
+  'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
+];
+
+
 const EMPTY = {
   name: '', city: '', state: '', street: '', country: 'India', postalCode: '',
   contactEmail: '', contactPhone: '',
@@ -34,6 +44,27 @@ export default function ListHotelPage() {
       ? f.amenities.filter(x => x !== a)
       : [...f.amenities, a],
   }));
+
+  const handlePostalCodeChange = async (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+    set('postalCode', val);
+    if (val.length === 6) {
+      try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${val}`);
+        const data = await res.json();
+        if (data && data[0] && data[0].Status === 'Success') {
+          const po = data[0].PostOffice[0];
+          setForm(f => ({ ...f, postalCode: val, city: po.District, state: po.State }));
+          addToast('City and state autofilled based on postal code.', 'success');
+        }
+      } catch (err) { /* ignore */ }
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 15);
+    set('contactPhone', val);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,7 +157,10 @@ export default function ListHotelPage() {
                   </div>
                   <div className="list-field">
                     <label style={stepLabel}>State *</label>
-                    {inp('state')}
+                    <select className="form-input" value={form.state} onChange={e => set('state', e.target.value)} required>
+                      <option value="" disabled>Select State</option>
+                      {INDIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
                   </div>
                   <div className="list-field full">
                     <label style={stepLabel}>Street Address *</label>
@@ -138,7 +172,7 @@ export default function ListHotelPage() {
                   </div>
                   <div className="list-field">
                     <label style={stepLabel}>Postal Code *</label>
-                    {inp('postalCode')}
+                    <input className="form-input" type="text" pattern="[0-9]{6}" value={form.postalCode} onChange={handlePostalCodeChange} required />
                   </div>
                   <div className="list-field">
                     <label style={stepLabel}>Contact Email *</label>
@@ -146,7 +180,7 @@ export default function ListHotelPage() {
                   </div>
                   <div className="list-field">
                     <label style={stepLabel}>Contact Phone *</label>
-                    {inp('contactPhone', 'tel')}
+                    <input className="form-input" type="tel" value={form.contactPhone} onChange={handlePhoneChange} placeholder="e.g. 9876543210" required />
                   </div>
                   <div className="list-field full">
                     <label style={stepLabel}>Description *</label>
