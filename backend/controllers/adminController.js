@@ -485,6 +485,41 @@ exports.approveHotel = asyncHandler(async (req, res, next) => {
   hotel.rejectionReason = '';
   await hotel.save();
 
+  // Activate drafted room types and rooms
+  await RoomType.updateMany({ hotel: hotel._id }, { isActive: true });
+  await Room.updateMany({ hotel: hotel._id }, { isActive: true });
+
+  // If for some reason physical rooms weren't seeded previously, seed them now
+  const roomTypes = await RoomType.find({ hotel: hotel._id });
+  for (const rt of roomTypes) {
+    const existingRooms = await Room.countDocuments({ roomType: rt._id });
+    if (existingRooms === 0) {
+      const ROOMS = 5;
+      const roomDocs = [];
+      for (let i = 1; i <= ROOMS; i++) {
+        roomDocs.push({
+          hotel: hotel._id, roomType: rt._id, roomNumber: `S${String(i).padStart(3, '0')}`,
+          floor: Math.ceil(i / 4), status: 'available', isActive: true,
+        });
+      }
+      await Room.insertMany(roomDocs);
+
+      const DAYS = 90;
+      const today = new Date();
+      const utcToday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+      const inventoryDocs = [];
+      for (let i = 0; i < DAYS; i++) {
+        const date = new Date(utcToday);
+        date.setUTCDate(utcToday.getUTCDate() + i);
+        inventoryDocs.push({
+          hotel: hotel._id, roomType: rt._id, date,
+          totalRooms: ROOMS, availableCount: ROOMS, heldCount: 0, bookedCount: 0, demandIndex: 0,
+        });
+      }
+      await InventoryCalendar.insertMany(inventoryDocs, { ordered: false });
+    }
+  }
+
   res.status(200).json({
     success: true,
     message: `"${hotel.name}" is now live.`,
@@ -545,7 +580,7 @@ exports.submitHotel = asyncHandler(async (req, res, next) => {
   });
 
   // Create a draft room type (inventory seeded after approval)
-  await RoomType.create({
+  const roomType = await RoomType.create({
     hotel: hotel._id,
     name: 'Standard Room',
     description: `Standard room at ${hotel.name}.`,
@@ -557,6 +592,42 @@ exports.submitHotel = asyncHandler(async (req, res, next) => {
     cancellationPolicy: { freeCancellationHours: 24 },
     isActive: false,
   });
+
+  // Create Physical Rooms (inactive until approved)
+  const ROOMS = Math.max(1, Math.min(Number(totalRooms), 100));
+  const roomDocs = [];
+  for (let i = 1; i <= ROOMS; i++) {
+    roomDocs.push({
+      hotel: hotel._id,
+      roomType: roomType._id,
+      roomNumber: `S${String(i).padStart(3, '0')}`,
+      floor: Math.ceil(i / 4),
+      status: 'available',
+      isActive: false,
+    });
+  }
+  await Room.insertMany(roomDocs);
+
+  // Seed Inventory
+  const DAYS = 90;
+  const today = new Date();
+  const utcToday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+  const inventoryDocs = [];
+  for (let i = 0; i < DAYS; i++) {
+    const date = new Date(utcToday);
+    date.setUTCDate(utcToday.getUTCDate() + i);
+    inventoryDocs.push({
+      hotel: hotel._id,
+      roomType: roomType._id,
+      date,
+      totalRooms: ROOMS,
+      availableCount: ROOMS,
+      heldCount: 0,
+      bookedCount: 0,
+      demandIndex: 0,
+    });
+  }
+  await InventoryCalendar.insertMany(inventoryDocs, { ordered: false });
 
   res.status(201).json({
     success: true,
