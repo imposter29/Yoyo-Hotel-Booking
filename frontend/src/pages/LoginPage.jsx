@@ -18,8 +18,12 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(form);
-      navigate(from, { replace: true });
+      const user = await login(form);
+      if (user?.role === 'superadmin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       setError(err.message || 'Invalid email or password.');
     } finally {

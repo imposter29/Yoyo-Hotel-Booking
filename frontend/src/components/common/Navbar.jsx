@@ -73,8 +73,12 @@ export default function Navbar() {
                     </div>
                     <hr className="divider" />
                     {/* Guest-only links */}
-                    <Link to="/my-bookings" className="dropdown-item" role="menuitem"> My Bookings</Link>
-                    <Link to="/profile" className="dropdown-item" role="menuitem"> My Profile</Link>
+                    {user.role !== 'superadmin' && (
+                      <>
+                        <Link to="/my-bookings" className="dropdown-item" role="menuitem"> My Bookings</Link>
+                        <Link to="/profile" className="dropdown-item" role="menuitem"> My Profile</Link>
+                      </>
+                    )}
 
                     {/* Hotel Admin — list / manage their property */}
                     {user.role === 'hotel_admin' && (
