@@ -206,7 +206,7 @@ function HotelsView() {
   const loadHotels = () => {
     setLoading(true);
     Promise.all([
-      adminAPI.getHotels({ limit: 200 }),
+      adminAPI.getHotels({ limit: 10000 }),
       adminAPI.getPendingHotels(),
     ]).then(([d, pd]) => {
       const list = d.data?.hotels || [];
