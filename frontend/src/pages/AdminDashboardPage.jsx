@@ -194,6 +194,8 @@ const EMPTY_HOTEL_FORM = {
 };
 
 function HotelsView() {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'superadmin';
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [roomEdits, setRoomEdits] = useState({});
@@ -210,10 +212,14 @@ function HotelsView() {
 
   const loadHotels = () => {
     setLoading(true);
-    Promise.all([
-      adminAPI.getHotels({ limit: 10000 }),
-      adminAPI.getPendingHotels(),
-    ]).then(([d, pd]) => {
+    const requests = [adminAPI.getHotels({ limit: 10000 })];
+    if (isSuperAdmin) {
+      requests.push(adminAPI.getPendingHotels());
+    } else {
+      requests.push(Promise.resolve({ data: { hotels: [] } }));
+    }
+
+    Promise.all(requests).then(([d, pd]) => {
       const list = d.data?.hotels || [];
       setHotels(list);
       setPending(pd.data?.hotels || []);
