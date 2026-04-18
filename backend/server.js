@@ -51,7 +51,7 @@ app.get('/health', (req, res) => {
 });
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
-const API_VERSION = '/api/v1';
+const API_VERSION = '/api';
 
 app.use(`${API_VERSION}/auth`,       authRoutes);
 app.use(`${API_VERSION}/hotels`,     hotelRoutes);

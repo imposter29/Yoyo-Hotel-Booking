@@ -130,9 +130,9 @@ Yoyo-Hotel-Booking/
 
 ## API Reference
 
-Base URL: `http://localhost:5000/api/v1`
+Base URL: `http://localhost:3000/api/`
 
-### Auth — `/api/v1/auth`
+### Auth — `/api/auth`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | POST | `/register` | Public | Register a new user |
@@ -142,7 +142,7 @@ Base URL: `http://localhost:5000/api/v1`
 | PATCH | `/profile` | Protected | Update name, phone, avatar |
 | PATCH | `/change-password` | Protected | Change password |
 
-### Hotels — `/api/v1/hotels`
+### Hotels — `/api/hotels`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET | `/` | Public | Search/filter hotels (includes `startingFrom` price) |
@@ -151,7 +151,7 @@ Base URL: `http://localhost:5000/api/v1`
 | POST | `/submit` | hotel_admin | Submit hotel for superadmin approval |
 | DELETE | `/:id` | superadmin | Soft-delete (deactivate) a hotel |
 
-### Room Types — `/api/v1/room-types`
+### Room Types — `/api/room-types`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET | `/` | Public | List room types (filter by `hotelId`) |
@@ -162,7 +162,7 @@ Base URL: `http://localhost:5000/api/v1`
 | GET | `/:id/rooms` | hotel_admin | List physical rooms of this type |
 | POST | `/:id/rooms` | hotel_admin | Add a physical room to this type |
 
-### Bookings — `/api/v1/bookings`
+### Bookings — `/api/bookings`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | POST | `/check` | Public | Check availability + get yield price quote |
@@ -171,27 +171,27 @@ Base URL: `http://localhost:5000/api/v1`
 | GET | `/:id` | Protected | Get single booking |
 | PATCH | `/:id/cancel` | Protected | Cancel a booking |
 
-### Payments — `/api/v1/payments`
+### Payments — `/api/payments`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | POST | `/initiate` | Protected | Initiate a payment for a booking |
 | POST | `/:paymentId/confirm` | Protected | Confirm payment → transitions booking to confirmed |
 | GET | `/booking/:bookingId` | Protected | Get payment record for a booking |
 
-### Reviews — `/api/v1/hotels/:hotelId/reviews`
+### Reviews — `/api/hotels/:hotelId/reviews`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET | `/` | Public | Get reviews for a hotel |
 | POST | `/` | guest | Submit a review |
 | DELETE | `/:reviewId` | Protected | Delete a review (owner or superadmin) |
 
-### Cities — `/api/v1/cities`
+### Cities — `/api/cities`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET | `/` | Public | List cities (with hotel count) |
 | GET | `/stats` | Public | City stats for the homepage |
 
-### Deals — `/api/v1/deals`
+### Deals — `/api/deals`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET | `/` | Public | List all active deals |
@@ -200,14 +200,14 @@ Base URL: `http://localhost:5000/api/v1`
 | PATCH | `/:id` | superadmin | Update a deal |
 | DELETE | `/:id` | superadmin | Delete a deal |
 
-### Newsletter — `/api/v1/newsletter`
+### Newsletter — `/api/newsletter`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | POST | `/subscribe` | Public | Subscribe to newsletter |
 | POST | `/unsubscribe` | Public | Unsubscribe |
 | GET | `/subscribers` | superadmin | List all subscribers |
 
-### Admin — `/api/v1/admin`
+### Admin — `/api/admin`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET | `/analytics` | superadmin | Platform-wide analytics |
@@ -264,7 +264,7 @@ NODE_ENV=development
 
 **`frontend/.env`**
 ```
-VITE_API_URL=http://localhost:5000/api/v1
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ---

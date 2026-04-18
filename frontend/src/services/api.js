@@ -1,5 +1,5 @@
 // Central API service layer
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('yoyo_token');
