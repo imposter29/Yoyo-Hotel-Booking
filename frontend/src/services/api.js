@@ -27,6 +27,7 @@ export const hotelsAPI = {
   search:  (params) => { const qs = new URLSearchParams(params).toString(); return request(`/hotels?${qs}`); },
   getAll:  (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/hotels?${qs}`); },
   getById: (id) => request(`/hotels/${id}`),
+  submit:  (body) => request('/hotels/submit', { method: 'POST', body: JSON.stringify(body) }),
   create:  (body) => request('/hotels', { method: 'POST', body: JSON.stringify(body) }),
   update:  (id, body) => request(`/hotels/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
   delete:  (id) => request(`/hotels/${id}`, { method: 'DELETE' }),

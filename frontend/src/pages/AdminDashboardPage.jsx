@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { adminAPI, hotelsAPI, dealsAPI } from '../services/api';
+import { adminAPI, hotelsAPI, dealsAPI, listingAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -272,8 +272,13 @@ function HotelsView() {
         });
         addToast('Hotel updated successfully.', 'success');
       } else {
-        const res = await adminAPI.createHotel({ ...form, pricePerNight: Number(form.pricePerNight) });
-        addToast(`Hotel ${res.data.hotel.name} created!`, 'success');
+        if (isSuperAdmin) {
+          const res = await adminAPI.createHotel({ ...form, pricePerNight: Number(form.pricePerNight) });
+          addToast(`Hotel ${res.data.hotel.name} created!`, 'success');
+        } else {
+          const res = await listingAPI.submit({ ...form, pricePerNight: Number(form.pricePerNight) });
+          addToast(res.message || 'Hotel submitted for approval!', 'success');
+        }
       }
       setShowCreate(false); setEditingHotelId(null); setForm(EMPTY_HOTEL_FORM); loadHotels();
     } catch (err) { addToast(err.message || 'Failed.', 'error'); }
@@ -510,12 +515,16 @@ function HotelsView() {
                     {edit.saving ? '...' : 'Save'}
                   </button>
                 </div>,
-                <span className={`badge ${h.isActive ? 'badge-green' : 'badge-red'}`}>{h.isActive ? 'Active' : 'Inactive'}</span>,
+                <span className={`badge ${h.approvalStatus === 'pending' ? 'badge-gray' : h.isActive ? 'badge-green' : 'badge-red'}`}>
+                  {h.approvalStatus === 'pending' ? 'Pending Approval' : h.isActive ? 'Active' : 'Inactive'}
+                </span>,
                 <div style={{ display:'flex', gap:6 }}>
                   <button className="btn btn-sm btn-outline" onClick={() => handleEditClick(h)} style={{ fontSize:12 }}>Edit</button>
-                  <button className={`btn btn-sm ${h.isActive ? 'btn-outline' : 'btn-primary'}`} onClick={() => toggleActive(h)} style={{ fontSize:12 }}>
-                    {h.isActive ? 'Deactivate' : 'Activate'}
-                  </button>
+                  {h.approvalStatus !== 'pending' && (
+                    <button className={`btn btn-sm ${h.isActive ? 'btn-outline' : 'btn-primary'}`} onClick={() => toggleActive(h)} style={{ fontSize:12 }}>
+                      {h.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                  )}
                 </div>,
               ];
             })}
