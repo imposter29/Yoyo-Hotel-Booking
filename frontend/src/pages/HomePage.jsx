@@ -7,7 +7,12 @@ import './HomePage.css';
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_LABELS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
-function toISO(d) { return d.toISOString().split('T')[0]; }
+function toISO(d) {
+  const yr = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const da = String(d.getDate()).padStart(2, '0');
+  return `${yr}-${mo}-${da}`;
+}
 function fmtDisplay(iso) {
   if (!iso) return '—';
   const d = new Date(iso + 'T00:00:00');
