@@ -62,12 +62,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ─── Virtual: full name ────────────────────────────────────────────────────────
+//  Virtual: full name 
 userSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-// ─── Pre-save: hash password ───────────────────────────────────────────────────
+//  Pre-save: hash password 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('passwordHash')) return next();
   const salt = await bcrypt.genSalt(12);
@@ -75,12 +75,12 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// ─── Instance method: compare password ────────────────────────────────────────
+//  Instance method: compare password 
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.passwordHash);
 };
 
-// ─── Instance method: generate JWT ────────────────────────────────────────────
+//  Instance method: generate JWT 
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign(
     { id: this._id, role: this.role },

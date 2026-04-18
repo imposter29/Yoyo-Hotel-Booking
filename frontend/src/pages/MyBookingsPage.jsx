@@ -28,7 +28,7 @@ function BookingCard({ booking, onCancel }) {
       <div className="booking-card-header">
         <div>
           <h3 className="booking-hotel-name">{hotel?.name || 'Hotel Name'}</h3>
-          <div className="booking-location">📍 {hotel?.address?.city}, {hotel?.address?.country}</div>
+          <div className="booking-location"> {hotel?.address?.city}, {hotel?.address?.country}</div>
           <div style={{ fontSize: 12, color: '#a3a3a3', marginTop: 4 }}>Ref: {ref}</div>
         </div>
         <span className={`badge ${statusCfg.cls}`}>{statusCfg.label}</span>
@@ -47,8 +47,8 @@ function BookingCard({ booking, onCancel }) {
           </div>
         </div>
         <div className="booking-meta">
-          <span>🌙 {booking.totalNights} Night{booking.totalNights > 1 ? 's' : ''}</span>
-          <span>👤 {booking.guestCount} Guest{booking.guestCount > 1 ? 's' : ''}</span>
+          <span> {booking.totalNights} Night{booking.totalNights > 1 ? 's' : ''}</span>
+          <span> {booking.guestCount} Guest{booking.guestCount > 1 ? 's' : ''}</span>
         </div>
       </div>
 
@@ -145,7 +145,7 @@ export default function MyBookingsPage() {
           <div className="bookings-error" role="alert">{error}</div>
         ) : filtered.length === 0 ? (
           <div className="bookings-empty">
-            <div className="empty-icon">📋</div>
+            <div className="empty-icon"></div>
             <h3>{filter === 'all' ? 'No bookings yet' : `No ${filter} bookings`}</h3>
             <p>Start exploring hotels and make your first booking!</p>
             <Link to="/hotels" className="btn btn-primary btn-lg">Browse Hotels</Link>

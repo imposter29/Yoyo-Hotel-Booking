@@ -1,4 +1,4 @@
-# Yoyo Hotel Booking 🏨
+# Yoyo Hotel Booking 
 
 A full-stack hotel booking platform built with the MERN stack. Features a **Yield Pricing Engine** with OOP strategy patterns, real-time inventory tracking, a booking state machine, and a three-tier role system.
 
@@ -57,73 +57,73 @@ A full-stack hotel booking platform built with the MERN stack. Features a **Yiel
 
 ```
 Yoyo-Hotel-Booking/
-├── backend/
-│   ├── config/
-│   │   └── db.js                         # MongoDB connection
-│   ├── controllers/
-│   │   ├── authController.js             # Register, Login, GetMe
-│   │   ├── hotelController.js            # Hotel CRUD + search + startingFrom price
-│   │   ├── bookingController.js          # Availability check, Hold, Cancel
-│   │   ├── paymentController.js          # Payment recording
-│   │   ├── reviewController.js           # Hotel reviews
-│   │   ├── roomTypeController.js         # Room type management
-│   │   └── adminController.js            # Superadmin actions
-│   ├── jobs/
-│   │   └── holdExpiryJob.js              # Cron: expire holds every 5 min
-│   ├── middleware/
-│   │   ├── auth.js                       # JWT protect + authorize(roles)
-│   │   ├── errorHandler.js              # Global error handler
-│   │   └── validators/                   # Joi schema validators
-│   ├── models/
-│   │   ├── User.js                       # guest | hotel_admin | superadmin
-│   │   ├── Hotel.js                      # Hotel with geo + amenities + approval
-│   │   ├── RoomType.js                   # Room category + base rate + cancellation policy
-│   │   ├── Room.js                       # Physical room entity
-│   │   ├── Booking.js                    # State machine: hold→confirmed→cancelled
-│   │   ├── InventoryCalendar.js          # Per-day availability + demand index
-│   │   ├── PricingRule.js                # DB-driven pricing rule config
-│   │   ├── Payment.js                    # Payment record
-│   │   ├── Review.js                     # Hotel reviews
-│   │   └── Deal.js                       # Hotel deals/promotions
-│   ├── routes/                           # Express route definitions
-│   ├── services/
-│   │   ├── booking/
-│   │   │   └── AvailabilityService.js    # Atomic room reservation
-│   │   ├── pricing/
-│   │   │   ├── PricingStrategy.js        # Abstract base + 6 concrete strategies
-│   │   │   ├── PricingStrategyFactory.js # Factory: ruleType → strategy class
-│   │   │   └── YieldPricingEngine.js     # Engine: loads, composes, applies strategies
-│   │   └── notification/
-│   │       └── notificationService.js    # EventEmitter-based email notifications
-│   ├── utils/
-│   │   ├── AppError.js                   # Operational error class
-│   │   └── asyncHandler.js              # Async try/catch wrapper
-│   ├── seeds/                            # Database seed scripts
-│   ├── server.js                         # Express entry point
-│   └── .env.example
-│
-└── frontend/
-    └── src/
-        ├── components/
-        │   └── common/                   # Navbar, Footer, Layout
-        ├── context/
-        │   └── AuthContext.jsx           # JWT auth state + rehydration
-        ├── pages/
-        │   ├── HomePage.jsx              # Hero search + custom MiniCalendar
-        │   ├── HotelsPage.jsx            # Listings with real prices + filters
-        │   ├── HotelDetailPage.jsx       # Gallery, room types, reviews
-        │   ├── BookingPage.jsx           # Booking form with custom date picker
-        │   ├── BookingConfirmationPage.jsx
-        │   ├── PaymentPage.jsx
-        │   ├── MyBookingsPage.jsx
-        │   ├── LoginPage.jsx
-        │   ├── RegisterPage.jsx
-        │   ├── ProfilePage.jsx
-        │   ├── ListHotelPage.jsx         # Hotel admin: list a hotel
-        │   └── AdminDashboardPage.jsx    # Superadmin dashboard
-        ├── services/
-        │   └── api.js                    # Axios instance + interceptors
-        └── App.jsx                       # Router + protected routes
+ backend/
+    config/
+       db.js                         # MongoDB connection
+    controllers/
+       authController.js             # Register, Login, GetMe
+       hotelController.js            # Hotel CRUD + search + startingFrom price
+       bookingController.js          # Availability check, Hold, Cancel
+       paymentController.js          # Payment recording
+       reviewController.js           # Hotel reviews
+       roomTypeController.js         # Room type management
+       adminController.js            # Superadmin actions
+    jobs/
+       holdExpiryJob.js              # Cron: expire holds every 5 min
+    middleware/
+       auth.js                       # JWT protect + authorize(roles)
+       errorHandler.js              # Global error handler
+       validators/                   # Joi schema validators
+    models/
+       User.js                       # guest | hotel_admin | superadmin
+       Hotel.js                      # Hotel with geo + amenities + approval
+       RoomType.js                   # Room category + base rate + cancellation policy
+       Room.js                       # Physical room entity
+       Booking.js                    # State machine: hold→confirmed→cancelled
+       InventoryCalendar.js          # Per-day availability + demand index
+       PricingRule.js                # DB-driven pricing rule config
+       Payment.js                    # Payment record
+       Review.js                     # Hotel reviews
+       Deal.js                       # Hotel deals/promotions
+    routes/                           # Express route definitions
+    services/
+       booking/
+          AvailabilityService.js    # Atomic room reservation
+       pricing/
+          PricingStrategy.js        # Abstract base + 6 concrete strategies
+          PricingStrategyFactory.js # Factory: ruleType → strategy class
+          YieldPricingEngine.js     # Engine: loads, composes, applies strategies
+       notification/
+           notificationService.js    # EventEmitter-based email notifications
+    utils/
+       AppError.js                   # Operational error class
+       asyncHandler.js              # Async try/catch wrapper
+    seeds/                            # Database seed scripts
+    server.js                         # Express entry point
+    .env.example
+
+ frontend/
+     src/
+         components/
+            common/                   # Navbar, Footer, Layout
+         context/
+            AuthContext.jsx           # JWT auth state + rehydration
+         pages/
+            HomePage.jsx              # Hero search + custom MiniCalendar
+            HotelsPage.jsx            # Listings with real prices + filters
+            HotelDetailPage.jsx       # Gallery, room types, reviews
+            BookingPage.jsx           # Booking form with custom date picker
+            BookingConfirmationPage.jsx
+            PaymentPage.jsx
+            MyBookingsPage.jsx
+            LoginPage.jsx
+            RegisterPage.jsx
+            ProfilePage.jsx
+            ListHotelPage.jsx         # Hotel admin: list a hotel
+            AdminDashboardPage.jsx    # Superadmin dashboard
+         services/
+            api.js                    # Axios instance + interceptors
+         App.jsx                       # Router + protected routes
 ```
 
 ---

@@ -30,16 +30,16 @@ const Room = require('../models/Room');
 const InventoryCalendar = require('../models/InventoryCalendar');
 const User = require('../models/User');
 
-// ─── Resolve CSV file path ─────────────────────────────────────────────────────
+//  Resolve CSV file path 
 const fileArgIdx = process.argv.indexOf('--file');
 const csvPath = fileArgIdx !== -1
   ? path.resolve(process.argv[fileArgIdx + 1])
   : path.join(__dirname, 'data', 'hotels.csv');
 
-// ─── Parse CSV → array of row objects ─────────────────────────────────────────
+//  Parse CSV → array of row objects 
 function loadCSV(filePath) {
   if (!fs.existsSync(filePath)) {
-    console.error(`❌  CSV file not found: ${filePath}`);
+    console.error(`  CSV file not found: ${filePath}`);
     console.error(`    Place your CSV at seeds/data/hotels.csv`);
     console.error(`    Or run: node seeds/seedHotels.js --file /path/to/your/file.csv`);
     console.error(`    See seeds/data/hotels.example.csv for the expected columns.`);
@@ -62,7 +62,7 @@ function loadCSV(filePath) {
   });
 }
 
-// ─── Group flat CSV rows into hotel → roomTypes structure ──────────────────────
+//  Group flat CSV rows into hotel → roomTypes structure 
 function groupRows(rows) {
   const hotelMap = new Map();
 
@@ -144,7 +144,7 @@ function buildImages(row) {
   return imgs;
 }
 
-// ─── Seed 90-day inventory for a room ─────────────────────────────────────────
+//  Seed 90-day inventory for a room 
 async function seedInventory(roomId, roomTypeId, days = 90) {
   const docs = [];
   const base = new Date();
@@ -157,10 +157,10 @@ async function seedInventory(roomId, roomTypeId, days = 90) {
   await InventoryCalendar.insertMany(docs, { ordered: false }).catch(() => {});
 }
 
-// ─── Main seed ─────────────────────────────────────────────────────────────────
+//  Main seed 
 async function seed() {
   await connectDB();
-  console.log(`\n🌱  Seeder starting…`);
+  console.log(`\n  Seeder starting…`);
   console.log(`    CSV: ${csvPath}\n`);
 
   const rows = loadCSV(csvPath);
@@ -170,7 +170,7 @@ async function seed() {
   // Ensure a superadmin exists to own the hotels
   let admin = await User.findOne({ role: 'superadmin' });
   if (!admin) {
-    console.log('⚙️   No superadmin found — creating seed admin user…');
+    console.log('   No superadmin found — creating seed admin user…');
     admin = await User.create({
       firstName: 'Seed',
       lastName: 'Admin',
@@ -178,7 +178,7 @@ async function seed() {
       passwordHash: 'Admin@1234',
       role: 'superadmin',
     });
-    console.log(`    ✅ Created admin: admin@yoyo.com / Admin@1234\n`);
+    console.log(`     Created admin: admin@yoyo.com / Admin@1234\n`);
   }
 
   let hotelsCreated = 0, skipped = 0, roomTypesCreated = 0, roomsCreated = 0;
@@ -192,14 +192,14 @@ async function seed() {
       'address.city': hotelFields.address.city,
     });
     if (existing) {
-      console.log(`⏭️   Skipping "${hotelFields.name}" in ${hotelFields.address.city} (already exists)`);
+      console.log(`⏭   Skipping "${hotelFields.name}" in ${hotelFields.address.city} (already exists)`);
       skipped++;
       continue;
     }
 
     const hotel = await Hotel.create({ ...hotelFields, managedBy: admin._id });
     hotelsCreated++;
-    console.log(`🏨  ${hotel.name} — ${hotel.address.city}, ${hotel.address.country}`);
+    console.log(`  ${hotel.name} — ${hotel.address.city}, ${hotel.address.country}`);
 
     for (const rtData of (roomTypesData || [])) {
       const { roomCount = 5, ...rtFields } = rtData;
@@ -219,27 +219,27 @@ async function seed() {
         await seedInventory(room._id, roomType._id, 90);
       }
 
-      console.log(`    └─ 🛏️  ${roomType.name}: ${roomCount} rooms @ ₹${rtFields.baseRatePerNight}/night`);
+      console.log(`       ${roomType.name}: ${roomCount} rooms @ ₹${rtFields.baseRatePerNight}/night`);
     }
   }
 
-  console.log('\n──────────────────────────────');
-  console.log('✅  Seeding complete!');
+  console.log('\n');
+  console.log('  Seeding complete!');
   console.log(`    Hotels created:  ${hotelsCreated}`);
   console.log(`    Skipped:         ${skipped}`);
   console.log(`    Room types:      ${roomTypesCreated}`);
   console.log(`    Rooms:           ${roomsCreated}`);
   console.log(`    Inventory:       90 days per room`);
-  console.log('──────────────────────────────\n');
+  console.log('\n');
 
   await mongoose.disconnect();
   process.exit(0);
 }
 
-// ─── Destroy ──────────────────────────────────────────────────────────────────
+//  Destroy 
 async function destroy() {
   await connectDB();
-  console.log('\n🔥  Destroying all hotel data…');
+  console.log('\n  Destroying all hotel data…');
   const [h, rt, r, ic] = await Promise.all([
     Hotel.deleteMany({}),
     RoomType.deleteMany({}),
@@ -251,7 +251,7 @@ async function destroy() {
   process.exit(0);
 }
 
-// ─── Entry point ──────────────────────────────────────────────────────────────
+//  Entry point 
 if (process.argv.includes('--destroy')) {
   destroy().catch(console.error);
 } else {

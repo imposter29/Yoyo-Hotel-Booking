@@ -3,7 +3,7 @@ import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { adminAPI, hotelsAPI, dealsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
-// ─── Shared helpers ────────────────────────────────────────────────────────────
+//  Shared helpers 
 const STATUS_CONFIG = {
   confirmed: 'badge-green', hold: 'badge-gray', cancelled: 'badge-red',
   checked_in: 'badge-green', checked_out: 'badge-gray', expired: 'badge-red',
@@ -48,7 +48,7 @@ function AdminCard({ children }) {
   return <div style={{ background: 'white', borderRadius: 14, padding: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: 20 }}>{children}</div>;
 }
 
-// ─── Analytics ────────────────────────────────────────────────────────────────
+//  Analytics 
 function AnalyticsView() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,17 +64,17 @@ function AnalyticsView() {
     <div>
       <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 24 }}>Analytics Overview</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 28 }}>
-        <StatCard icon="👤" label="Total Users" value={ov.totalUsers} color="#3b82f6" />
-        <StatCard icon="🏨" label="Active Hotels" value={ov.totalHotels} color="#8b5cf6" />
-        <StatCard icon="📋" label="Total Bookings" value={ov.totalBookings} color="#ef4444" />
-        <StatCard icon="💰" label="Total Revenue" value={`₹${(ov.totalRevenue || 0).toLocaleString('en-IN')}`} color="#16a34a" />
-        <StatCard icon="✅" label="Confirmed" value={ov.confirmedBookings} color="#16a34a" />
-        <StatCard icon="📈" label="Conversion Rate" value={ov.conversionRate} color="#f59e0b" />
+        <StatCard icon="" label="Total Users" value={ov.totalUsers} color="#3b82f6" />
+        <StatCard icon="" label="Active Hotels" value={ov.totalHotels} color="#8b5cf6" />
+        <StatCard icon="" label="Total Bookings" value={ov.totalBookings} color="#ef4444" />
+        <StatCard icon="" label="Total Revenue" value={`₹${(ov.totalRevenue || 0).toLocaleString('en-IN')}`} color="#16a34a" />
+        <StatCard icon="" label="Confirmed" value={ov.confirmedBookings} color="#16a34a" />
+        <StatCard icon="" label="Conversion Rate" value={ov.conversionRate} color="#f59e0b" />
       </div>
 
       {data?.topHotels?.length > 0 && (
         <AdminCard>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>🏆 Top Hotels by Revenue</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}> Top Hotels by Revenue</h3>
           <AdminTable
             headers={['Hotel', 'Bookings', 'Revenue']}
             rows={data.topHotels.map((h) => [
@@ -88,7 +88,7 @@ function AnalyticsView() {
 
       {data?.recentBookings?.length > 0 && (
         <AdminCard>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>🕐 Recent Bookings</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}> Recent Bookings</h3>
           <AdminTable
             headers={['Guest', 'Hotel', 'Status', 'Amount', 'Date']}
             rows={data.recentBookings.map((b) => [
@@ -105,7 +105,7 @@ function AnalyticsView() {
   );
 }
 
-// ─── Bookings ─────────────────────────────────────────────────────────────────
+//  Bookings 
 function BookingsView() {
   const [bookings, setBookings] = useState([]);
   const [total, setTotal] = useState(0);
@@ -179,7 +179,7 @@ function BookingsView() {
   );
 }
 
-// ─── Hotels ───────────────────────────────────────────────────────────────────
+//  Hotels 
 const AMENITY_OPTIONS = ['wifi','ac','parking','pool','gym','spa','restaurant','bar','elevator','laundry','roomService','conferenceRoom'];
 const EMPTY_HOTEL_FORM = {
   name:'', city:'', state:'', street:'', country:'India', postalCode:'',
@@ -270,7 +270,7 @@ function HotelsView() {
         </button>
       </div>
 
-      {/* ── Pending Approvals ── */}
+      {/*  Pending Approvals  */}
       {pending.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <h3 style={{ fontSize:15, fontWeight:700, color:'#b45309', marginBottom:12, display:'flex', alignItems:'center', gap:8 }}>
@@ -471,7 +471,7 @@ function HotelsView() {
   );
 }
 
-// ─── Users ────────────────────────────────────────────────────────────────────
+//  Users 
 function UsersView() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -531,7 +531,7 @@ function UsersView() {
   );
 }
 
-// ─── Deals ────────────────────────────────────────────────────────────────────
+//  Deals 
 function DealsView() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -572,7 +572,7 @@ function DealsView() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800 }}>Deals & Offers</h2>
         <button className="btn btn-red btn-sm" onClick={() => setShowForm(!showForm)} id="btn-new-deal">
-          {showForm ? '✕ Cancel' : '＋ New Deal'}
+          {showForm ? ' Cancel' : '＋ New Deal'}
         </button>
       </div>
 
@@ -628,16 +628,16 @@ function DealsView() {
   );
 }
 
-// ─── Nav ──────────────────────────────────────────────────────────────────────
+//  Nav 
 const NAV_ITEMS = [
-  { path: '/admin',           label: 'Analytics', icon: '📊' },
-  { path: '/admin/bookings',  label: 'Bookings',  icon: '📋' },
-  { path: '/admin/hotels',    label: 'Hotels',    icon: '🏨' },
-  { path: '/admin/users',     label: 'Users',     icon: '👥' },
-  { path: '/admin/deals',     label: 'Deals',     icon: '🎁' },
+  { path: '/admin',           label: 'Analytics', icon: '' },
+  { path: '/admin/bookings',  label: 'Bookings',  icon: '' },
+  { path: '/admin/hotels',    label: 'Hotels',    icon: '' },
+  { path: '/admin/users',     label: 'Users',     icon: '' },
+  { path: '/admin/deals',     label: 'Deals',     icon: '' },
 ];
 
-// ─── Main Dashboard shell ──────────────────────────────────────────────────────
+//  Main Dashboard shell 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
   const location = useLocation();

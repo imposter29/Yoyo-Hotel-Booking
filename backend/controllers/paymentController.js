@@ -4,11 +4,11 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const notificationService = require('../services/notification/notificationService');
 
-// ─── Helper: generate a mock gateway charge ID ─────────────────────────────────
+//  Helper: generate a mock gateway charge ID 
 const mockChargeId = () =>
   `mock_chg_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
-// ─── Helpers: compute refund amount based on cancellation policy ───────────────
+//  Helpers: compute refund amount based on cancellation policy 
 function computeRefund(booking) {
   const hoursUntilCheckIn =
     (new Date(booking.checkIn) - Date.now()) / (1000 * 60 * 60);
@@ -19,9 +19,9 @@ function computeRefund(booking) {
   return 0;                                                        // no refund
 }
 
-// ─── @desc  Initiate payment for a HOLD booking ───────────────────────────────
-// ─── @route POST /api/v1/payments/initiate
-// ─── @access Private (guest)
+//  @desc  Initiate payment for a HOLD booking 
+//  @route POST /api/v1/payments/initiate
+//  @access Private (guest)
 exports.initiatePayment = asyncHandler(async (req, res, next) => {
   const { bookingId, paymentMethod = 'test' } = req.body;
 
@@ -78,9 +78,9 @@ exports.initiatePayment = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Confirm payment (mock / webhook simulation) ───────────────────────
-// ─── @route POST /api/v1/payments/:paymentId/confirm
-// ─── @access Private (guest — mock; in production this would be a webhook)
+//  @desc  Confirm payment (mock / webhook simulation) 
+//  @route POST /api/v1/payments/:paymentId/confirm
+//  @access Private (guest — mock; in production this would be a webhook)
 exports.confirmPayment = asyncHandler(async (req, res, next) => {
   const payment = await Payment.findById(req.params.paymentId).populate('booking');
   if (!payment) return next(new AppError('Payment not found.', 404));
@@ -134,9 +134,9 @@ exports.confirmPayment = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Get payment details for a booking ─────────────────────────────────
-// ─── @route GET /api/v1/payments/booking/:bookingId
-// ─── @access Private
+//  @desc  Get payment details for a booking 
+//  @route GET /api/v1/payments/booking/:bookingId
+//  @access Private
 exports.getPaymentByBooking = asyncHandler(async (req, res, next) => {
   const booking = await Booking.findById(req.params.bookingId);
   if (!booking) return next(new AppError('Booking not found.', 404));
@@ -151,9 +151,9 @@ exports.getPaymentByBooking = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: { payment } });
 });
 
-// ─── @desc  Refund a payment (on cancellation) ────────────────────────────────
-// ─── @route POST /api/v1/payments/:paymentId/refund
-// ─── @access Private (superadmin)
+//  @desc  Refund a payment (on cancellation) 
+//  @route POST /api/v1/payments/:paymentId/refund
+//  @access Private (superadmin)
 exports.refundPayment = asyncHandler(async (req, res, next) => {
   const payment = await Payment.findById(req.params.paymentId).populate('booking');
   if (!payment) return next(new AppError('Payment not found.', 404));

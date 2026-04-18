@@ -60,7 +60,7 @@ export default function Navbar() {
                 >
                   <div className="avatar">{user.firstName?.[0]?.toUpperCase() || 'U'}</div>
                   <span className="nav-user-name">{user.firstName}</span>
-                  <span className="nav-chevron">▾</span>
+                  <span className="nav-chevron"></span>
                 </button>
                 {userMenuOpen && (
                   <div className="user-dropdown" role="menu">
@@ -73,24 +73,24 @@ export default function Navbar() {
                     </div>
                     <hr className="divider" />
                     {/* Guest-only links */}
-                    <Link to="/my-bookings" className="dropdown-item" role="menuitem">📋 My Bookings</Link>
-                    <Link to="/profile" className="dropdown-item" role="menuitem">👤 My Profile</Link>
+                    <Link to="/my-bookings" className="dropdown-item" role="menuitem"> My Bookings</Link>
+                    <Link to="/profile" className="dropdown-item" role="menuitem"> My Profile</Link>
 
                     {/* Hotel Admin — list / manage their property */}
                     {user.role === 'hotel_admin' && (
                       <Link to="/list-hotel" className="dropdown-item dropdown-item--highlight" role="menuitem">
-                        🏨 List My Hotel
+                         List My Hotel
                       </Link>
                     )}
 
                     {/* Superadmin — full dashboard */}
                     {user.role === 'superadmin' && (
-                      <Link to="/admin" className="dropdown-item" role="menuitem">⚙️ Admin Dashboard</Link>
+                      <Link to="/admin" className="dropdown-item" role="menuitem"> Admin Dashboard</Link>
                     )}
 
                     <hr className="divider" />
                     <button className="dropdown-item dropdown-item--red" onClick={logout} role="menuitem">
-                      🚪 Sign Out
+                       Sign Out
                     </button>
                   </div>
                 )}

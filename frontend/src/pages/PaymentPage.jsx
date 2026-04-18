@@ -4,9 +4,9 @@ import { paymentsAPI, bookingsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 const METHODS = [
-  { value: 'card',       label: '💳 Credit / Debit Card', desc: 'Visa, Mastercard, RuPay' },
-  { value: 'upi',        label: '📱 UPI',                 desc: 'GPay, PhonePe, Paytm' },
-  { value: 'netbanking', label: '🏦 Net Banking',         desc: 'All major banks' },
+  { value: 'card',       label: ' Credit / Debit Card', desc: 'Visa, Mastercard, RuPay' },
+  { value: 'upi',        label: ' UPI',                 desc: 'GPay, PhonePe, Paytm' },
+  { value: 'netbanking', label: ' Net Banking',         desc: 'All major banks' },
 ];
 
 const BANKS = [
@@ -14,7 +14,7 @@ const BANKS = [
   'Axis Bank', 'Kotak Mahindra Bank', 'Punjab National Bank', 'Bank of Baroda',
 ];
 
-// ── Formatters ──────────────────────────────────────────────────────────────
+//  Formatters 
 function fmtCard(v) {
   return v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
 }
@@ -23,7 +23,7 @@ function fmtExpiry(v) {
   return d.length >= 3 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 }
 
-// ── Shared style helpers ────────────────────────────────────────────────────
+//  Shared style helpers 
 const inputStyle = (err) => ({
   width: '100%', padding: '11px 14px', fontSize: 14,
   border: `1.5px solid ${err ? '#ef4444' : '#e5e5e5'}`, borderRadius: 8,
@@ -33,7 +33,7 @@ const inputStyle = (err) => ({
 const labelStyle = { fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 5, display: 'block' };
 const errStyle   = { fontSize: 11, color: '#ef4444', marginTop: 3 };
 
-// ── Card Form ───────────────────────────────────────────────────────────────
+//  Card Form 
 function CardForm({ onValid }) {
   const [f, setF] = useState({ name: '', number: '', expiry: '', cvv: '' });
   const [t, setT] = useState({});
@@ -99,13 +99,13 @@ function CardForm({ onValid }) {
       </div>
       <button type="submit" className="btn btn-red btn-xl" style={{ width: '100%', borderRadius: 10 }}
         id="btn-card-confirm">
-        Confirm Payment ✓
+        Confirm Payment 
       </button>
     </form>
   );
 }
 
-// ── UPI Form ────────────────────────────────────────────────────────────────
+//  UPI Form 
 function UpiForm({ onValid }) {
   const [upiId, setUpiId] = useState('');
   const [touched, setTouched] = useState(false);
@@ -139,13 +139,13 @@ function UpiForm({ onValid }) {
       </div>
       <button type="submit" className="btn btn-red btn-xl" style={{ width: '100%', borderRadius: 10 }}
         id="btn-upi-confirm">
-        Confirm Payment ✓
+        Confirm Payment 
       </button>
     </form>
   );
 }
 
-// ── Net Banking Form ────────────────────────────────────────────────────────
+//  Net Banking Form 
 function NetBankingForm({ onValid }) {
   const [bank, setBank] = useState('');
   const [touched, setTouched] = useState(false);
@@ -170,19 +170,19 @@ function NetBankingForm({ onValid }) {
         {bank && (
           <div style={{ marginTop: 10, fontSize: 12, color: '#737373', background: '#f0fdf4',
             border: '1px solid #86efac', borderRadius: 8, padding: '8px 12px' }}>
-            ✅ You will be securely redirected to <strong>{bank}</strong>'s portal.
+             You will be securely redirected to <strong>{bank}</strong>'s portal.
           </div>
         )}
       </div>
       <button type="submit" className="btn btn-red btn-xl" style={{ width: '100%', borderRadius: 10 }}
         id="btn-netbanking-confirm">
-        Proceed to Bank ✓
+        Proceed to Bank 
       </button>
     </form>
   );
 }
 
-// ── Main Page ───────────────────────────────────────────────────────────────
+//  Main Page 
 export default function PaymentPage() {
   const { bookingId } = useParams();
   const navigate = useNavigate();
@@ -221,7 +221,7 @@ export default function PaymentPage() {
     setBusy(true); setStep('processing');
     try {
       await paymentsAPI.confirm(paymentId);
-      addToast('Payment successful! Booking confirmed. 🎉', 'success');
+      addToast('Payment successful! Booking confirmed. ', 'success');
       navigate(`/booking/confirmation/${bookingId}`);
     } catch (err) {
       setError(err.message);
@@ -247,7 +247,7 @@ export default function PaymentPage() {
 
         {/* Header */}
         <div style={{ background: 'linear-gradient(135deg,#1a1a1a,#2d2d2d)', padding: '28px 32px', color: 'white' }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800 }}>🔒 Secure Payment</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 800 }}> Secure Payment</h1>
           <p style={{ fontSize: 13, opacity: 0.65, marginTop: 4 }}>Encrypted &amp; secured by SSL</p>
         </div>
 
@@ -278,11 +278,11 @@ export default function PaymentPage() {
           {error && (
             <div style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 8,
               padding: '12px 16px', fontSize: 14, color: '#dc2626', marginBottom: 20 }} role="alert">
-              ⚠️ {error}
+               {error}
             </div>
           )}
 
-          {/* ── Step 1: Choose method ── */}
+          {/*  Step 1: Choose method  */}
           {step === 'select' && (
             <>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Choose Payment Method</div>
@@ -314,7 +314,7 @@ export default function PaymentPage() {
             </>
           )}
 
-          {/* ── Step 2: Payment form ── */}
+          {/*  Step 2: Payment form  */}
           {step === 'form' && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
@@ -333,7 +333,7 @@ export default function PaymentPage() {
             </>
           )}
 
-          {/* ── Step 3: Processing ── */}
+          {/*  Step 3: Processing  */}
           {step === 'processing' && (
             <div style={{ textAlign: 'center', padding: '30px 0' }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
@@ -342,7 +342,7 @@ export default function PaymentPage() {
           )}
 
           <p style={{ fontSize: 11, color: '#a3a3a3', textAlign: 'center', marginTop: 20 }}>
-            🔒 256-bit SSL • PCI DSS Compliant
+             256-bit SSL • PCI DSS Compliant
           </p>
         </div>
       </div>

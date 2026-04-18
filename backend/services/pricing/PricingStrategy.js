@@ -1,5 +1,5 @@
 /**
- * ─── PricingStrategy — Abstract Base Class (Interface Simulation) ─────────────
+ *  PricingStrategy — Abstract Base Class (Interface Simulation) 
  *
  * In JavaScript we simulate interfaces via an abstract base class.
  * All concrete pricing strategies MUST extend this class and implement:
@@ -41,7 +41,7 @@ class PricingStrategy {
   }
 }
 
-// ─── Concrete Strategy: Seasonal Pricing ──────────────────────────────────────
+//  Concrete Strategy: Seasonal Pricing 
 /**
  * Applies a multiplier when the check-in date falls within a defined season.
  * E.g. Christmas peak → ×1.4
@@ -58,7 +58,7 @@ class SeasonalPricing extends PricingStrategy {
   }
 }
 
-// ─── Concrete Strategy: Demand-Based Pricing ──────────────────────────────────
+//  Concrete Strategy: Demand-Based Pricing 
 /**
  * Applies a multiplier when the demand index (booking velocity) exceeds a threshold.
  * E.g. high search volume → ×1.2
@@ -70,7 +70,7 @@ class DemandPricing extends PricingStrategy {
   }
 }
 
-// ─── Concrete Strategy: Occupancy-Based Pricing ───────────────────────────────
+//  Concrete Strategy: Occupancy-Based Pricing 
 /**
  * Applies a multiplier when room occupancy exceeds a threshold.
  * E.g. >80% booked → ×1.3 (scarcity premium)
@@ -82,7 +82,7 @@ class OccupancyPricing extends PricingStrategy {
   }
 }
 
-// ─── Concrete Strategy: Length-of-Stay Discount ───────────────────────────────
+//  Concrete Strategy: Length-of-Stay Discount 
 /**
  * Applies a discount multiplier for longer stays.
  * E.g. stays ≥7 nights → ×0.9 (10% off)
@@ -94,7 +94,7 @@ class LengthOfStayDiscount extends PricingStrategy {
   }
 }
 
-// ─── Concrete Strategy: Early Bird Discount ───────────────────────────────────
+//  Concrete Strategy: Early Bird Discount 
 /**
  * Applies a discount when the booking is made far in advance.
  * E.g. booked ≥30 days before check-in → ×0.85
@@ -106,7 +106,7 @@ class EarlyBirdPricing extends PricingStrategy {
   }
 }
 
-// ─── Concrete Strategy: Last-Minute Pricing ───────────────────────────────────
+//  Concrete Strategy: Last-Minute Pricing 
 /**
  * Applies a multiplier (or discount) for last-minute bookings.
  * E.g. booking within 3 days of check-in → ×0.8 (fill empty rooms)

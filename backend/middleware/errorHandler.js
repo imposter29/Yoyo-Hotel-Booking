@@ -38,7 +38,7 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (process.env.NODE_ENV === 'development') {
-    console.error('❌ Error:', err);
+    console.error(' Error:', err);
   }
 
   res.status(statusCode).json({

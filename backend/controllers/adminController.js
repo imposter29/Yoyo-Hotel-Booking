@@ -8,9 +8,9 @@ const InventoryCalendar = require('../models/InventoryCalendar');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 
-// ─── @desc  Get platform-wide analytics ──────────────────────────────────────
-// ─── @route GET /api/v1/admin/analytics
-// ─── @access Private (superadmin)
+//  @desc  Get platform-wide analytics 
+//  @route GET /api/v1/admin/analytics
+//  @access Private (superadmin)
 exports.getAnalytics = asyncHandler(async (req, res) => {
   const [
     totalUsers,
@@ -81,9 +81,9 @@ exports.getAnalytics = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── @desc  Get all users ─────────────────────────────────────────────────────
-// ─── @route GET /api/v1/admin/users
-// ─── @access Private (superadmin)
+//  @desc  Get all users 
+//  @route GET /api/v1/admin/users
+//  @access Private (superadmin)
 exports.getAllUsers = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, role, search } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
@@ -116,9 +116,9 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── @desc  Get a single user ─────────────────────────────────────────────────
-// ─── @route GET /api/v1/admin/users/:id
-// ─── @access Private (superadmin)
+//  @desc  Get a single user 
+//  @route GET /api/v1/admin/users/:id
+//  @access Private (superadmin)
 exports.getUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id)
     .select('-passwordHash -resetPasswordToken -resetPasswordExpires')
@@ -128,9 +128,9 @@ exports.getUserById = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: { user } });
 });
 
-// ─── @desc  Update user role or active status ─────────────────────────────────
-// ─── @route PATCH /api/v1/admin/users/:id
-// ─── @access Private (superadmin)
+//  @desc  Update user role or active status 
+//  @route PATCH /api/v1/admin/users/:id
+//  @access Private (superadmin)
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const allowedFields = ['role', 'isActive'];
   const updates = {};
@@ -147,9 +147,9 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: { user } });
 });
 
-// ─── @desc  Get all bookings (admin view) ────────────────────────────────────
-// ─── @route GET /api/v1/admin/bookings
-// ─── @access Private (hotel_admin, superadmin)
+//  @desc  Get all bookings (admin view) 
+//  @route GET /api/v1/admin/bookings
+//  @access Private (hotel_admin, superadmin)
 exports.getAllBookings = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, status, hotelId } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
@@ -186,9 +186,9 @@ exports.getAllBookings = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── @desc  Update booking status (admin) ────────────────────────────────────
-// ─── @route PATCH /api/v1/admin/bookings/:id/status
-// ─── @access Private (hotel_admin, superadmin)
+//  @desc  Update booking status (admin) 
+//  @route PATCH /api/v1/admin/bookings/:id/status
+//  @access Private (hotel_admin, superadmin)
 exports.updateBookingStatus = asyncHandler(async (req, res, next) => {
   const { status } = req.body;
   if (!status) return next(new AppError('Status is required.', 400));
@@ -206,9 +206,9 @@ exports.updateBookingStatus = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: { booking } });
 });
 
-// ─── @desc  Get all hotels (admin view with management info) ─────────────────
-// ─── @route GET /api/v1/admin/hotels
-// ─── @access Private (superadmin)
+//  @desc  Get all hotels (admin view with management info) 
+//  @route GET /api/v1/admin/hotels
+//  @access Private (superadmin)
 exports.getAdminHotels = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, search } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
@@ -243,9 +243,9 @@ exports.getAdminHotels = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── @desc  Get all reviews (admin view) ─────────────────────────────────────
-// ─── @route GET /api/v1/admin/reviews
-// ─── @access Private (superadmin)
+//  @desc  Get all reviews (admin view) 
+//  @route GET /api/v1/admin/reviews
+//  @access Private (superadmin)
 exports.getAdminReviews = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
@@ -269,9 +269,9 @@ exports.getAdminReviews = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── @desc  Update available rooms for a hotel (all future dates) ─────────────
-// ─── @route PATCH /api/v1/admin/hotels/:hotelId/rooms
-// ─── @access Private (superadmin)
+//  @desc  Update available rooms for a hotel (all future dates) 
+//  @route PATCH /api/v1/admin/hotels/:hotelId/rooms
+//  @access Private (superadmin)
 exports.updateHotelRooms = asyncHandler(async (req, res, next) => {
   const { hotelId } = req.params;
   const { totalRooms } = req.body;
@@ -358,9 +358,9 @@ exports.updateHotelRooms = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Create a hotel (with room type + inventory) ──────────────────────
-// ─── @route POST /api/v1/admin/hotels
-// ─── @access Private (superadmin)
+//  @desc  Create a hotel (with room type + inventory) 
+//  @route POST /api/v1/admin/hotels
+//  @access Private (superadmin)
 exports.createAdminHotel = asyncHandler(async (req, res, next) => {
   const {
     name, description,
@@ -377,7 +377,7 @@ exports.createAdminHotel = asyncHandler(async (req, res, next) => {
     return next(new AppError('name, city, and pricePerNight are required.', 400));
   }
 
-  // ── 1. Create Hotel ────────────────────────────────────────────────────────
+  //  1. Create Hotel 
   const hotel = await Hotel.create({
     name: name.trim(),
     description: description || `${name} is a ${starRating}-star property in ${city}.`,
@@ -392,7 +392,7 @@ exports.createAdminHotel = asyncHandler(async (req, res, next) => {
     managedBy: req.user._id,
   });
 
-  // ── 2. Create Default Room Type ────────────────────────────────────────────
+  //  2. Create Default Room Type 
   const roomType = await RoomType.create({
     hotel: hotel._id,
     name: 'Standard Room',
@@ -406,7 +406,7 @@ exports.createAdminHotel = asyncHandler(async (req, res, next) => {
     isActive: true,
   });
 
-  // ── 3. Create Physical Rooms ───────────────────────────────────────────────
+  //  3. Create Physical Rooms 
   const ROOMS = Math.max(1, Math.min(Number(totalRooms), 100));
   const roomDocs = [];
   for (let i = 1; i <= ROOMS; i++) {
@@ -421,7 +421,7 @@ exports.createAdminHotel = asyncHandler(async (req, res, next) => {
   }
   await Room.insertMany(roomDocs);
 
-  // ── 4. Seed Inventory ──────────────────────────────────────────────────────
+  //  4. Seed Inventory 
   const DAYS = Math.max(30, Math.min(Number(inventoryDays), 365));
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -449,9 +449,9 @@ exports.createAdminHotel = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Approve a pending hotel (makes it live) ───────────────────────────
-// ─── @route PATCH /api/v1/admin/hotels/:hotelId/approve
-// ─── @access Private (superadmin)
+//  @desc  Approve a pending hotel (makes it live) 
+//  @route PATCH /api/v1/admin/hotels/:hotelId/approve
+//  @access Private (superadmin)
 exports.approveHotel = asyncHandler(async (req, res, next) => {
   const hotel = await Hotel.findById(req.params.hotelId);
   if (!hotel) return next(new AppError('Hotel not found.', 404));
@@ -468,9 +468,9 @@ exports.approveHotel = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Reject a pending hotel ───────────────────────────────────────────
-// ─── @route PATCH /api/v1/admin/hotels/:hotelId/reject
-// ─── @access Private (superadmin)
+//  @desc  Reject a pending hotel 
+//  @route PATCH /api/v1/admin/hotels/:hotelId/reject
+//  @access Private (superadmin)
 exports.rejectHotel = asyncHandler(async (req, res, next) => {
   const hotel = await Hotel.findById(req.params.hotelId);
   if (!hotel) return next(new AppError('Hotel not found.', 404));
@@ -487,9 +487,9 @@ exports.rejectHotel = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Submit hotel listing request (hotel_admin) ────────────────────────
-// ─── @route POST /api/v1/hotels/submit
-// ─── @access Private (hotel_admin)
+//  @desc  Submit hotel listing request (hotel_admin) 
+//  @route POST /api/v1/hotels/submit
+//  @access Private (hotel_admin)
 exports.submitHotel = asyncHandler(async (req, res, next) => {
   const {
     name, description,
@@ -541,9 +541,9 @@ exports.submitHotel = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ─── @desc  Get pending hotels ────────────────────────────────────────────────
-// ─── @route GET /api/v1/admin/hotels/pending
-// ─── @access Private (superadmin)
+//  @desc  Get pending hotels 
+//  @route GET /api/v1/admin/hotels/pending
+//  @access Private (superadmin)
 exports.getPendingHotels = asyncHandler(async (req, res) => {
   const hotels = await Hotel.find({ approvalStatus: 'pending' })
     .populate('managedBy', 'firstName lastName email')

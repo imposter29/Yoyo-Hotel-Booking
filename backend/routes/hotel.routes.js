@@ -19,7 +19,7 @@ const {
 const reviewRouter = require('./review.routes');
 router.use('/:hotelId/reviews', reviewRouter);
 
-// ─── Submit listing (hotel_admin — goes to pending review) ───────────────────
+//  Submit listing (hotel_admin — goes to pending review) 
 router.post('/submit', protect, authorize('hotel_admin', 'superadmin'), submitHotel);
 
 router

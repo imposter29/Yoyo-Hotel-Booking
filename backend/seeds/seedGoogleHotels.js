@@ -33,7 +33,7 @@ const Room = require('../models/Room');
 const InventoryCalendar = require('../models/InventoryCalendar');
 const User = require('../models/User');
 
-// ─── Config ───────────────────────────────────────────────────────────────────
+//  Config 
 const CSV_PATH = path.join(
   __dirname,
   '../../Google Hotel Data Clean v2.csv'
@@ -143,12 +143,12 @@ async function seedInventory(hotelId, roomTypeId, totalRooms = 5, days = 90) {
   });
 }
 
-// ─── Main seed ─────────────────────────────────────────────────────────────────
+//  Main seed 
 async function seed() {
   await connectDB();
 
   if (!fs.existsSync(CSV_PATH)) {
-    console.error(`❌  CSV not found at: ${CSV_PATH}`);
+    console.error(`  CSV not found at: ${CSV_PATH}`);
     process.exit(1);
   }
 
@@ -186,7 +186,7 @@ async function seed() {
     if (!isNaN(n)) hotelEntries = hotelEntries.slice(0, n);
   }
 
-  console.log(`\n🌱  Google Hotel Seeder`);
+  console.log(`\n  Google Hotel Seeder`);
   console.log(`    CSV: ${CSV_PATH}`);
   console.log(`    Total raw rows:     ${rows.length}`);
   console.log(`    Unique hotels:      ${hotelMap.size}`);
@@ -201,7 +201,7 @@ async function seed() {
       passwordHash: 'Admin@1234',
       role: 'superadmin',
     });
-    console.log(`⚙️   Created admin: admin@yoyo.com / Admin@1234\n`);
+    console.log(`   Created admin: admin@yoyo.com / Admin@1234\n`);
   }
 
   let created = 0, skipped = 0, errors = 0;
@@ -237,7 +237,7 @@ async function seed() {
       });
       if (existing) { skipped++; continue; }
 
-      // ── Create Hotel ────────────────────────────────────────────────────────
+      //  Create Hotel 
       const hotel = await Hotel.create({
         name: name.slice(0, 100),
         description: `${name} is a ${starRating}-star property in ${city}, India, offering comfortable stays with a selection of amenities.`,
@@ -265,7 +265,7 @@ async function seed() {
         managedBy: admin._id,
       });
 
-      // ── Create Room Type ────────────────────────────────────────────────────
+      //  Create Room Type 
       const roomType = await RoomType.create({
         hotel: hotel._id,
         name: 'Standard Room',
@@ -278,7 +278,7 @@ async function seed() {
         cancellationPolicy: { freeCancellationHours: 24 },
       });
 
-      // ── Create 5 rooms ───────────────────────────────────────────────────────
+      //  Create 5 rooms 
       const TOTAL_ROOMS = 5;
       for (let i = 1; i <= TOTAL_ROOMS; i++) {
         await Room.create({
@@ -290,36 +290,36 @@ async function seed() {
         });
       }
 
-      // ── Seed 90-day inventory (one doc per date per roomType) ────────────────
+      //  Seed 90-day inventory (one doc per date per roomType) 
       await seedInventory(hotel._id, roomType._id, TOTAL_ROOMS, 90);
 
       created++;
       if (created % 25 === 0 || created <= 5) {
-        console.log(`🏨  [${created}] ${name} — ${city} (★${starRating}, ₹${price})`);
+        console.log(`  [${created}] ${name} — ${city} (${starRating}, ₹${price})`);
       }
     } catch (err) {
       errors++;
-      console.error(`❌  ${name}: ${err.message}`);
+      console.error(`  ${name}: ${err.message}`);
     }
   }
 
-  console.log('\n──────────────────────────────────────────');
-  console.log('✅  Seeding complete!');
+  console.log('\n');
+  console.log('  Seeding complete!');
   console.log(`    Hotels created:   ${created}`);
   console.log(`    Already existed:  ${skipped}`);
   console.log(`    Errors:           ${errors}`);
   console.log(`    Rooms per hotel:  5`);
   console.log(`    Inventory:        90 days per room`);
-  console.log('──────────────────────────────────────────\n');
+  console.log('\n');
 
   await mongoose.disconnect();
   process.exit(0);
 }
 
-// ─── Destroy ──────────────────────────────────────────────────────────────────
+//  Destroy 
 async function destroy() {
   await connectDB();
-  console.log('\n🔥  Destroying all hotel data…');
+  console.log('\n  Destroying all hotel data…');
   const [h, rt, r, ic] = await Promise.all([
     Hotel.deleteMany({}),
     RoomType.deleteMany({}),

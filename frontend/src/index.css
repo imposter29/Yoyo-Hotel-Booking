@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ─── CSS Variables ─────────────────────────────────────────────────────────── */
+/*  CSS Variables  */
 :root {
   --yoyo-red: #ef4444;
   --yoyo-red-dark: #dc2626;
@@ -42,7 +42,7 @@
   text-rendering: optimizeLegibility;
 }
 
-/* ─── Reset ─────────────────────────────────────────────────────────────────── */
+/*  Reset  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body { background: var(--yoyo-white); color: var(--yoyo-black); min-height: 100vh; }
@@ -53,7 +53,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 input, textarea, select { font-family: inherit; }
 ul { list-style: none; }
 
-/* ─── Skeleton Loader ────────────────────────────────────────────────────────── */
+/*  Skeleton Loader  */
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -73,7 +73,7 @@ ul { list-style: none; }
 }
 .skeleton-img { width: 100%; padding-top: 60%; background: var(--yoyo-gray-200); animation: skeleton-pulse 1.5s ease infinite; }
 
-/* ─── Spinner ────────────────────────────────────────────────────────────────── */
+/*  Spinner  */
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
   width: 36px;
@@ -85,7 +85,7 @@ ul { list-style: none; }
 }
 
 
-/* ─── Utility Classes ────────────────────────────────────────────────────────── */
+/*  Utility Classes  */
 .container {
   width: 100%;
   max-width: 1280px;
@@ -111,7 +111,7 @@ ul { list-style: none; }
 .font-semibold { font-weight: 600; }
 .font-medium { font-weight: 500; }
 
-/* ─── Buttons ──────────────────────────────────────────────────────────────── */
+/*  Buttons  */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -151,7 +151,7 @@ ul { list-style: none; }
 .btn-lg { padding: 14px 28px; font-size: 16px; }
 .btn-xl { padding: 16px 32px; font-size: 16px; font-weight: 700; }
 
-/* ─── Form Elements ─────────────────────────────────────────────────────────── */
+/*  Form Elements  */
 .form-input {
   width: 100%;
   padding: 10px 14px;
@@ -166,7 +166,7 @@ ul { list-style: none; }
 .form-input:focus { border-color: var(--yoyo-black); }
 .form-input::placeholder { color: var(--yoyo-gray-400); }
 
-/* ─── Badge ─────────────────────────────────────────────────────────────────── */
+/*  Badge  */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -181,7 +181,7 @@ ul { list-style: none; }
 .badge-red { background: var(--yoyo-red-light); color: var(--yoyo-red-dark); }
 .badge-gray { background: var(--yoyo-gray-200); color: var(--yoyo-gray-700); }
 
-/* ─── Card ──────────────────────────────────────────────────────────────────── */
+/*  Card  */
 .card {
   background: white;
   border-radius: var(--radius-lg);
@@ -191,21 +191,21 @@ ul { list-style: none; }
 }
 .card:hover { box-shadow: var(--shadow-xl); transform: translateY(-3px); }
 
-/* ─── Section ───────────────────────────────────────────────────────────────── */
+/*  Section  */
 .section { padding: 60px 0; }
 .section-sm { padding: 40px 0; }
 .section-title { font-size: 28px; font-weight: 700; color: var(--yoyo-black); margin-bottom: 8px; }
 .section-subtitle { font-size: 15px; color: var(--yoyo-gray-500); }
 
-/* ─── Star Rating ────────────────────────────────────────────────────────────── */
+/*  Star Rating  */
 .stars { display: flex; gap: 2px; }
 .star { color: #f59e0b; font-size: 14px; }
 .star.empty { color: var(--yoyo-gray-300); }
 
-/* ─── Divider ───────────────────────────────────────────────────────────────── */
+/*  Divider  */
 .divider { border: none; border-top: 1px solid var(--yoyo-gray-200); margin: 0; }
 
-/* ─── Toast Notification ──────────────────────────────────────────────────────── */
+/*  Toast Notification  */
 @keyframes toast-in { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
 .toast-container {
@@ -233,7 +233,7 @@ ul { list-style: none; }
 }
 .toast.error { border-left-color: var(--yoyo-red); }
 
-/* ─── Responsive Helpers ─────────────────────────────────────────────────────── */
+/*  Responsive Helpers  */
 .hide-mobile { display: flex !important; }
 .show-mobile { display: none !important; }
 @media (max-width: 768px) {

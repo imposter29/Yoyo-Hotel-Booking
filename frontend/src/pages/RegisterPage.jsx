@@ -54,18 +54,18 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="auth-error" role="alert" aria-live="polite">⚠️ {error}</div>
+          <div className="auth-error" role="alert" aria-live="polite"> {error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="auth-form" aria-label="Registration form">
 
-          {/* ── Role Selector ── */}
+          {/*  Role Selector  */}
           <div className="form-group">
             <label className="form-label">I am a…</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 4 }}>
               {[
-                { value: 'guest',       icon: '🧳', title: 'Guest',       desc: 'I want to book hotels' },
-                { value: 'hotel_admin', icon: '🏨', title: 'Hotel Owner',  desc: 'I want to list my property' },
+                { value: 'guest',       icon: '', title: 'Guest',       desc: 'I want to book hotels' },
+                { value: 'hotel_admin', icon: '', title: 'Hotel Owner',  desc: 'I want to list my property' },
               ].map(opt => (
                 <label key={opt.value}
                   htmlFor={`role-${opt.value}`}
@@ -87,12 +87,12 @@ export default function RegisterPage() {
             </div>
             {form.role === 'hotel_admin' && (
               <p style={{ fontSize: 12, color: '#b45309', background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: 8, padding: '8px 12px', marginTop: 8 }}>
-                🏨 After signing up, you'll be directed to list your property. A Yoyo admin will review and approve it.
+                 After signing up, you'll be directed to list your property. A Yoyo admin will review and approve it.
               </p>
             )}
           </div>
 
-          {/* ── Name row ── */}
+          {/*  Name row  */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div className="form-group">
               <label htmlFor="reg-first-name" className="form-label">First Name *</label>

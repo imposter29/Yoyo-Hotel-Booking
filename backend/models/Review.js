@@ -54,11 +54,11 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-// ─── One review per guest per hotel ──────────────────────────────────────────
+//  One review per guest per hotel 
 reviewSchema.index({ hotel: 1, guest: 1 }, { unique: true });
 reviewSchema.index({ hotel: 1, createdAt: -1 });
 
-// ─── Post-save: recalculate hotel averageRating ───────────────────────────────
+//  Post-save: recalculate hotel averageRating 
 async function recalcHotelRating(hotelId) {
   const Hotel = mongoose.model('Hotel');
   const result = await mongoose.model('Review').aggregate([

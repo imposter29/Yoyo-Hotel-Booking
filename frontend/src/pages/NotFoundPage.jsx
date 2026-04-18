@@ -11,7 +11,7 @@ export default function NotFoundPage() {
       textAlign: 'center',
       padding: '40px 20px',
     }} id="not-found-page" role="main" aria-label="Page not found">
-      <div style={{ fontSize: 80, marginBottom: 16 }}>🏨</div>
+      <div style={{ fontSize: 80, marginBottom: 16 }}></div>
       <h1 style={{ fontSize: 48, fontWeight: 900, color: '#0f0f0f', marginBottom: 8 }}>404</h1>
       <p style={{ fontSize: 20, fontWeight: 700, color: '#0f0f0f', marginBottom: 8 }}>Page not found</p>
       <p style={{ fontSize: 14, color: '#737373', marginBottom: 32, maxWidth: 340 }}>

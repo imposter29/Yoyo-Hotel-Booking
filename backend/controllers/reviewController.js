@@ -3,9 +3,9 @@ const Booking = require('../models/Booking');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 
-// ─── @desc  Create a review for a hotel ──────────────────────────────────────
-// ─── @route POST /api/v1/hotels/:hotelId/reviews
-// ─── @access Private (any authenticated user)
+//  @desc  Create a review for a hotel 
+//  @route POST /api/v1/hotels/:hotelId/reviews
+//  @access Private (any authenticated user)
 exports.createReview = asyncHandler(async (req, res, next) => {
   const { hotelId } = req.params;
   const { rating, title, comment, categories, bookingId } = req.body;
@@ -57,9 +57,9 @@ exports.createReview = asyncHandler(async (req, res, next) => {
   res.status(201).json({ success: true, data: { review } });
 });
 
-// ─── @desc  Get all reviews for a hotel ──────────────────────────────────────
-// ─── @route GET /api/v1/hotels/:hotelId/reviews
-// ─── @access Public
+//  @desc  Get all reviews for a hotel 
+//  @route GET /api/v1/hotels/:hotelId/reviews
+//  @access Public
 exports.getHotelReviews = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const skip = (Number(page) - 1) * Number(limit);
@@ -83,9 +83,9 @@ exports.getHotelReviews = asyncHandler(async (req, res) => {
   });
 });
 
-// ─── @desc  Delete a review ───────────────────────────────────────────────────
-// ─── @route DELETE /api/v1/hotels/:hotelId/reviews/:reviewId
-// ─── @access Private (owner or superadmin)
+//  @desc  Delete a review 
+//  @route DELETE /api/v1/hotels/:hotelId/reviews/:reviewId
+//  @access Private (owner or superadmin)
 exports.deleteReview = asyncHandler(async (req, res, next) => {
   const review = await Review.findById(req.params.reviewId);
   if (!review) return next(new AppError('Review not found.', 404));

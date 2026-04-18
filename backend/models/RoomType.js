@@ -72,7 +72,7 @@ const roomTypeSchema = new mongoose.Schema(
   }
 );
 
-// ─── Virtual: individual rooms of this type ───────────────────────────────────
+//  Virtual: individual rooms of this type 
 roomTypeSchema.virtual('rooms', {
   ref: 'Room',
   localField: '_id',

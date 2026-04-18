@@ -21,7 +21,7 @@ export default function BookingConfirmationPage() {
 
   return (
     <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center' }} id="booking-confirmation-page" role="main">
-      <div style={{ fontSize: 72, marginBottom: 20 }}>✅</div>
+      <div style={{ fontSize: 72, marginBottom: 20 }}></div>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: '#16a34a', marginBottom: 8 }}>Booking Confirmed!</h1>
       <p style={{ fontSize: 16, color: '#525252', marginBottom: 4 }}>Your reservation has been successfully placed.</p>
       <p style={{ fontSize: 14, color: '#a3a3a3', marginBottom: 28 }}>A confirmation email has been sent to your inbox.</p>

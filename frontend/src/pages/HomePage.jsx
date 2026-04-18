@@ -77,7 +77,7 @@ function DateField({ id, label, value, minISO, onChange }) {
   );
 }
 
-// ─── Search Bar ───────────────────────────────────────────────────────────────
+//  Search Bar 
 function SearchBar() {
   const navigate = useNavigate();
   const today    = new Date();
@@ -134,7 +134,7 @@ function SearchBar() {
         />
         {searchError && (
           <span style={{ position:'absolute', bottom:-22, left:0, fontSize:12, color:'#ef4444', fontWeight:600, whiteSpace:'nowrap' }}>
-            ⚠ {searchError}
+             {searchError}
           </span>
         )}
       </div>
@@ -201,7 +201,7 @@ function SearchBar() {
   );
 }
 
-// ─── City Pills ───────────────────────────────────────────────────────────────
+//  City Pills 
 function PopularCities() {
   const navigate = useNavigate();
   const [cities, setCities] = useState([]);
@@ -215,9 +215,9 @@ function PopularCities() {
   if (cities.length === 0) return null;
 
   const CITY_EMOJI = {
-    Mumbai: '🌊', Delhi: '🏛️', Bangalore: '🌳', Goa: '🏖️', Jaipur: '🏰',
-    Chennai: '🎨', Kolkata: '🌸', Pune: '🎓', Hyderabad: '💎', Kochi: '⛵',
-    Srinagar: '🏔️', Mysore: '👑', Dehradun: '🌿', Pondicherry: '🇫🇷', Chandigarh: '🌱',
+    Mumbai: '', Delhi: '', Bangalore: '', Goa: '', Jaipur: '',
+    Chennai: '', Kolkata: '', Pune: '', Hyderabad: '', Kochi: '',
+    Srinagar: '', Mysore: '', Dehradun: '', Pondicherry: '', Chandigarh: '',
   };
 
   return (
@@ -232,7 +232,7 @@ function PopularCities() {
               onClick={() => navigate(`/hotels?city=${city}`)}
               id={`city-pill-${city.toLowerCase()}`}
             >
-              <span className="city-pill-emoji">{CITY_EMOJI[city] || '🏙️'}</span>
+              <span className="city-pill-emoji">{CITY_EMOJI[city] || ''}</span>
               <span className="city-pill-name">{city}</span>
               <span className="city-pill-count">{hotelCount} hotels</span>
             </button>
@@ -243,7 +243,7 @@ function PopularCities() {
   );
 }
 
-// ─── HomePage ─────────────────────────────────────────────────────────────────
+//  HomePage 
 export default function HomePage() {
   return (
     <main className="homepage" id="homepage">

@@ -1,4 +1,4 @@
-/* ─── Navbar Container ─────────────────────────────────────────────────────── */
+/*  Navbar Container  */
 .navbar {
   position: sticky;
   top: 0;
@@ -9,7 +9,7 @@
 }
 .navbar--scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.12); }
 
-/* ─── Main Nav Row ─────────────────────────────────────────────────────────── */
+/*  Main Nav Row  */
 .navbar-main { padding: 14px 0; }
 .navbar-main-inner {
   display: flex;
@@ -17,7 +17,7 @@
   justify-content: space-between;
 }
 
-/* ─── Logo ─────────────────────────────────────────────────────────────────── */
+/*  Logo  */
 .navbar-logo { display: flex; align-items: center; text-decoration: none; }
 .logo-yoyo {
   font-size: 26px;
@@ -32,7 +32,7 @@
   display: inline-block;       /* needed for background-clip to work properly */
 }
 
-/* ─── Auth ─────────────────────────────────────────────────────────────────── */
+/*  Auth  */
 .navbar-auth { display: flex; align-items: center; }
 .nav-auth-group { display: flex; align-items: center; gap: 8px; }
 
@@ -65,7 +65,7 @@
 }
 .avatar-lg { width: 40px; height: 40px; font-size: 16px; }
 
-/* ─── User Dropdown ────────────────────────────────────────────────────────── */
+/*  User Dropdown  */
 .user-menu-wrapper { position: relative; }
 .user-dropdown {
   position: absolute;
@@ -102,7 +102,7 @@
 .dropdown-item--highlight:hover { background: #fff5f5; color: #ef4444; }
 .user-dropdown .divider { margin: 4px 0; }
 
-/* ─── City Nav ─────────────────────────────────────────────────────────────── */
+/*  City Nav  */
 .navbar-cities {
   background: white;
   border-top: 1px solid #f0f0f0;
@@ -128,13 +128,13 @@
 .city-nav-link:hover { color: #0f0f0f; border-bottom-color: #ef4444; }
 .city-nav-link--all { color: #737373; margin-left: auto; font-style: italic; }
 
-/* ─── Animations ───────────────────────────────────────────────────────────── */
+/*  Animations  */
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Mobile ───────────────────────────────────────────────────────────────── */
+/*  Mobile  */
 @media (max-width: 768px) {
   .logo-yoyo { font-size: 22px; }
   .city-nav-link { padding: 8px 12px; font-size: 12px; }

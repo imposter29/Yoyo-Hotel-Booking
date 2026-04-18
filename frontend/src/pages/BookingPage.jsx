@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { bookingsAPI, roomTypesAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-// ─── Mini Calendar (same as HomePage) ────────────────────────────────────────
+//  Mini Calendar (same as HomePage) 
 const MONTHS_B = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_LBL  = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 function fmtB(iso) {
@@ -62,7 +62,7 @@ function BookingDateField({ id, label, value, minISO, onChange }) {
           borderRadius:8, padding:'10px 14px', fontSize:14, fontWeight:600, color:'#0f0f0f',
           cursor:'pointer', fontFamily:'inherit', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
         {fmtB(value)}
-        <span style={{ fontSize:16, color:'#a3a3a3' }}>📅</span>
+        <span style={{ fontSize:16, color:'#a3a3a3' }}></span>
       </button>
       {open && <BookingMiniCal value={value} minISO={minISO} onChange={onChange} onClose={()=>setOpen(false)} />}
     </div>
@@ -157,7 +157,7 @@ export default function BookingPage() {
 
         {error && (
           <div style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 8, padding: '12px 16px', fontSize: 14, color: '#dc2626', marginBottom: 20 }} role="alert">
-            ⚠️ {error}
+             {error}
           </div>
         )}
 

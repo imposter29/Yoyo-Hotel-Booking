@@ -16,11 +16,11 @@
 
 ```mermaid
 graph TD
-    Guest(["👤 Guest"])
-    HotelAdmin(["🏨 Hotel Admin"])
-    SuperAdmin(["🛡️ Super Admin"])
+    Guest([" Guest"])
+    HotelAdmin([" Hotel Admin"])
+    SuperAdmin([" Super Admin"])
     Scheduler(["⏰ Scheduler System"])
-    Notifier(["🔔 Notification System"])
+    Notifier([" Notification System"])
 
     subgraph "Authentication"
         UC_REG["Register Account"]
@@ -119,23 +119,23 @@ graph TD
 
 | Use Case | Actor | Description | Status |
 |----------|-------|-------------|--------|
-| Register Account | Guest | Email + password signup with role selection | ✅ |
-| Login (JWT) | All | Stateless JWT authentication | ✅ |
-| Search Hotels | Guest | Full-text search by city or hotel name | ✅ |
-| Browse by City | Guest | Filter hotels by city via navbar pills | ✅ |
-| View Hotel Detail | Guest | Images, amenities, room types, reviews | ✅ |
-| Check Room Availability | Guest | Queries InventoryCalendar for date range | ✅ |
-| Get Dynamic Yield Price | Guest | YieldPricingEngine applies strategy chain | ✅ |
-| Create Booking (HOLD) | Guest | 15-min HOLD with inventory decrement | ✅ |
-| Confirm Payment | Guest | Records payment, transitions to confirmed | ✅ |
-| Cancel Booking | Guest | State transition with inventory restore | ✅ |
-| View My Bookings | Guest | Full booking history with status | ✅ |
-| Write Review | Guest | Rating + comment linked to booking | ✅ |
-| List My Hotel | Hotel Admin | Submit hotel for superadmin approval | ✅ |
-| Manage Room Types | Hotel Admin | Create/edit rooms and pricing | ✅ |
-| Configure Pricing Rules | Hotel Admin | Set seasonal/demand/occupancy rules | ✅ |
-| Approve/Reject Hotels | Super Admin | Toggle hotel isApproved flag | ✅ |
-| Manage Users & Roles | Super Admin | Change roles, deactivate accounts | ✅ |
-| Release Expired Holds | Scheduler | Cron job every 5 min | ✅ |
-| Send Confirmation Email | Notifier | Async EventEmitter notification | ✅ |
-| Send Cancellation Alert | Notifier | Async EventEmitter notification | ✅ |
+| Register Account | Guest | Email + password signup with role selection |  |
+| Login (JWT) | All | Stateless JWT authentication |  |
+| Search Hotels | Guest | Full-text search by city or hotel name |  |
+| Browse by City | Guest | Filter hotels by city via navbar pills |  |
+| View Hotel Detail | Guest | Images, amenities, room types, reviews |  |
+| Check Room Availability | Guest | Queries InventoryCalendar for date range |  |
+| Get Dynamic Yield Price | Guest | YieldPricingEngine applies strategy chain |  |
+| Create Booking (HOLD) | Guest | 15-min HOLD with inventory decrement |  |
+| Confirm Payment | Guest | Records payment, transitions to confirmed |  |
+| Cancel Booking | Guest | State transition with inventory restore |  |
+| View My Bookings | Guest | Full booking history with status |  |
+| Write Review | Guest | Rating + comment linked to booking |  |
+| List My Hotel | Hotel Admin | Submit hotel for superadmin approval |  |
+| Manage Room Types | Hotel Admin | Create/edit rooms and pricing |  |
+| Configure Pricing Rules | Hotel Admin | Set seasonal/demand/occupancy rules |  |
+| Approve/Reject Hotels | Super Admin | Toggle hotel isApproved flag |  |
+| Manage Users & Roles | Super Admin | Change roles, deactivate accounts |  |
+| Release Expired Holds | Scheduler | Cron job every 5 min |  |
+| Send Confirmation Email | Notifier | Async EventEmitter notification |  |
+| Send Cancellation Alert | Notifier | Async EventEmitter notification |  |

@@ -1,9 +1,9 @@
 const Newsletter = require('../models/Newsletter');
 const asyncHandler = require('../utils/asyncHandler');
 
-// ─── @desc  Subscribe to newsletter ──────────────────────────────────────────
-// ─── @route POST /api/v1/newsletter/subscribe
-// ─── @access Public
+//  @desc  Subscribe to newsletter 
+//  @route POST /api/v1/newsletter/subscribe
+//  @access Public
 exports.subscribe = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -28,9 +28,9 @@ exports.subscribe = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, message: 'Successfully subscribed to exclusive deals!' });
 });
 
-// ─── @desc  Unsubscribe from newsletter ──────────────────────────────────────
-// ─── @route POST /api/v1/newsletter/unsubscribe
-// ─── @access Public
+//  @desc  Unsubscribe from newsletter 
+//  @route POST /api/v1/newsletter/unsubscribe
+//  @access Public
 exports.unsubscribe = asyncHandler(async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, message: 'Email is required.' });
@@ -43,9 +43,9 @@ exports.unsubscribe = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, message: 'Successfully unsubscribed.' });
 });
 
-// ─── @desc  Get all subscribers (admin) ──────────────────────────────────────
-// ─── @route GET /api/v1/newsletter/subscribers
-// ─── @access Private (superadmin)
+//  @desc  Get all subscribers (admin) 
+//  @route GET /api/v1/newsletter/subscribers
+//  @access Private (superadmin)
 exports.getSubscribers = asyncHandler(async (req, res) => {
   const { page = 1, limit = 50, active } = req.query;
   const skip = (Number(page) - 1) * Number(limit);

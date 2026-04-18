@@ -10,7 +10,7 @@ const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { startHoldExpiryJob } = require('./jobs/holdExpiryJob');
 
-// ─── Route imports ────────────────────────────────────────────────────────────
+//  Route imports 
 const authRoutes      = require('./routes/auth.routes');
 const hotelRoutes     = require('./routes/hotel.routes');
 const bookingRoutes   = require('./routes/booking.routes');
@@ -23,14 +23,14 @@ const adminRoutes     = require('./routes/admin.routes');
 
 const app = express();
 
-// ─── Trust proxy (required on Render / Heroku / any reverse proxy) ────────────
+//  Trust proxy (required on Render / Heroku / any reverse proxy) 
 // Fixes: ERR_ERL_UNEXPECTED_X_FORWARDED_FOR from express-rate-limit
 app.set('trust proxy', 1);
 
-// ─── Database ─────────────────────────────────────────────────────────────────
+//  Database 
 connectDB();
 
-// ─── CORS ─────────────────────────────────────────────────────────────────────
+//  CORS 
 // CLIENT_URL can be a comma-separated list of exact origins.
 // Vercel preview URLs are also auto-allowed via regex.
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
@@ -60,15 +60,15 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// ─── Global Rate Limiter ──────────────────────────────────────────────────────
+//  Global Rate Limiter 
 app.use('/api', apiLimiter);
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
+//  Health Check 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'Yoyo-Hotel-Booking API', timestamp: new Date() });
 });
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
+//  API Routes 
 const API_VERSION = '/api';
 
 app.use(`${API_VERSION}/auth`,       authRoutes);
@@ -81,7 +81,7 @@ app.use(`${API_VERSION}/deals`,      dealsRoutes);
 app.use(`${API_VERSION}/newsletter`, newsletterRoutes);
 app.use(`${API_VERSION}/admin`,      adminRoutes);
 
-// ─── 404 Handler ──────────────────────────────────────────────────────────────
+//  404 Handler 
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -89,19 +89,19 @@ app.use((req, res) => {
   });
 });
 
-// ─── Global Error Handler ─────────────────────────────────────────────────────
+//  Global Error Handler 
 app.use(errorHandler);
 
-// ─── Background Jobs ──────────────────────────────────────────────────────────
+//  Background Jobs 
 if (process.env.NODE_ENV !== 'test') {
   startHoldExpiryJob();
 }
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+//  Start Server 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Yoyo Hotel Booking API running on port ${PORT} [${process.env.NODE_ENV}]`);
-  console.log(`📋 API Endpoints:`);
+  console.log(` Yoyo Hotel Booking API running on port ${PORT} [${process.env.NODE_ENV}]`);
+  console.log(` API Endpoints:`);
   console.log(`   Auth:       ${API_VERSION}/auth`);
   console.log(`   Hotels:     ${API_VERSION}/hotels`);
   console.log(`   Bookings:   ${API_VERSION}/bookings`);
@@ -115,12 +115,12 @@ const server = app.listen(PORT, () => {
 
 // Graceful shutdown
 process.on('unhandledRejection', (err) => {
-  console.error('💥 Unhandled Rejection:', err.message);
+  console.error(' Unhandled Rejection:', err.message);
   server.close(() => process.exit(1));
 });
 
 process.on('SIGTERM', () => {
-  console.log('📴 SIGTERM received. Shutting down gracefully...');
+  console.log(' SIGTERM received. Shutting down gracefully...');
   server.close(() => process.exit(0));
 });
 

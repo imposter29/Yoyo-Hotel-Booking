@@ -15,7 +15,7 @@ function StarRating({ count, interactive = false, value = 0, onChange }) {
           className={`star${i < (interactive ? value : count) ? '' : ' empty'}`}
           onClick={() => interactive && onChange && onChange(i + 1)}
           style={interactive ? { cursor: 'pointer', fontSize: 20 } : {}}
-        >★</span>
+        ></span>
       ))}
     </div>
   );
@@ -32,7 +32,7 @@ function ReviewCard({ review }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div className="stars" style={{ gap: 2 }}>
-            {Array.from({ length: 5 }, (_, i) => <span key={i} className={`star${i < review.rating ? '' : ' empty'}`} style={{ fontSize: 12 }}>★</span>)}
+            {Array.from({ length: 5 }, (_, i) => <span key={i} className={`star${i < review.rating ? '' : ' empty'}`} style={{ fontSize: 12 }}></span>)}
           </div>
           <span style={{ fontSize: 12, color: '#a3a3a3' }}>{date}</span>
         </div>
@@ -53,7 +53,7 @@ function RoomTypeCard({ rt, onBook }) {
       <div style={{ width: 160, flexShrink: 0, background: '#f5f5f5', position: 'relative' }}>
         {primaryImg
           ? <img src={primaryImg} alt={rt.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <div style={{ width: '100%', height: '100%', minHeight: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>🛏️</div>
+          : <div style={{ width: '100%', height: '100%', minHeight: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}></div>
         }
       </div>
       <div style={{ flex: 1, padding: 18, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -66,8 +66,8 @@ function RoomTypeCard({ rt, onBook }) {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#737373', marginBottom: 8 }}>
-            <span>👤 Max {rt.maxOccupancy} guests</span>
-            {rt.bedConfiguration?.[0] && <span>🛏️ {rt.bedConfiguration[0].count} {rt.bedConfiguration[0].bedType} bed</span>}
+            <span> Max {rt.maxOccupancy} guests</span>
+            {rt.bedConfiguration?.[0] && <span> {rt.bedConfiguration[0].count} {rt.bedConfiguration[0].bedType} bed</span>}
           </div>
           {rt.amenities?.length > 0 && (
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -164,7 +164,7 @@ export default function HotelDetailPage() {
   if (error || !hotel) return (
     <div className="detail-page">
       <div className="container detail-error" role="alert">
-        <div style={{ fontSize: 64 }}>😞</div>
+        <div style={{ fontSize: 64 }}></div>
         <h2>Hotel Not Found</h2>
         <p>{error}</p>
         <Link to="/hotels" className="btn btn-primary">Browse Hotels</Link>
@@ -195,7 +195,7 @@ export default function HotelDetailPage() {
           <div className="gallery-main">
             {images.length > 0
               ? <img src={images[activeImg]?.url} alt={`${hotel.name} - photo ${activeImg + 1}`} className="gallery-main-img" />
-              : <div className="gallery-placeholder" aria-label="No image">🏨</div>
+              : <div className="gallery-placeholder" aria-label="No image"></div>
             }
           </div>
           {images.length > 1 && (
@@ -216,7 +216,7 @@ export default function HotelDetailPage() {
             <div className="detail-header">
               <div>
                 <h1 className="detail-name">{hotel.name}</h1>
-                <div className="detail-location">📍 {hotel.address?.street}, {hotel.address?.city}, {hotel.address?.country}</div>
+                <div className="detail-location"> {hotel.address?.street}, {hotel.address?.city}, {hotel.address?.country}</div>
                 <div className="detail-stars-row">
                   <StarRating count={hotel.starRating} />
                   {hotel.averageRating > 0 && <span className="badge badge-green">{hotel.averageRating.toFixed(1)} / 5</span>}
@@ -260,8 +260,8 @@ export default function HotelDetailPage() {
                 {[
                   ['Check-in', hotel.policies?.checkInTime || '14:00'],
                   ['Check-out', hotel.policies?.checkOutTime || '11:00'],
-                  ['Pets', hotel.policies?.petFriendly ? '✅ Allowed' : '❌ Not allowed'],
-                  ['Smoking', hotel.policies?.smokingAllowed ? '✅ Allowed' : '🚭 Not allowed'],
+                  ['Pets', hotel.policies?.petFriendly ? ' Allowed' : ' Not allowed'],
+                  ['Smoking', hotel.policies?.smokingAllowed ? ' Allowed' : ' Not allowed'],
                 ].map(([k, v]) => (
                   <div key={k} className="policy-item">
                     <span className="policy-label">{k}</span>
@@ -279,7 +279,7 @@ export default function HotelDetailPage() {
                 </h2>
                 {user && (
                   <button className="btn btn-outline btn-sm" onClick={() => setShowReviewForm(!showReviewForm)} id="btn-write-review">
-                    {showReviewForm ? '✕ Cancel' : '✍️ Write a Review'}
+                    {showReviewForm ? ' Cancel' : ' Write a Review'}
                   </button>
                 )}
               </div>
@@ -324,9 +324,9 @@ export default function HotelDetailPage() {
                 </div>
               </div>
               <div className="booking-features">
-                <div className="bfeat">✅ Free cancellation</div>
-                <div className="bfeat">✅ No booking fees</div>
-                <div className="bfeat">✅ Verified rooms</div>
+                <div className="bfeat"> Free cancellation</div>
+                <div className="bfeat"> No booking fees</div>
+                <div className="bfeat"> Verified rooms</div>
               </div>
               {roomTypes.length > 0 ? (
                 <a href="#available-rooms" className="btn btn-red btn-xl booking-btn" id="btn-see-rooms" onClick={(e) => { e.preventDefault(); document.querySelector('.detail-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
@@ -340,7 +340,7 @@ export default function HotelDetailPage() {
               <p className="booking-note">You won't be charged yet</p>
               <div className="booking-contact">
                 <p className="booking-contact-title">Need help?</p>
-                <a href="tel:01246201611" className="booking-phone">📞 0124-6201611</a>
+                <a href="tel:01246201611" className="booking-phone"> 0124-6201611</a>
               </div>
             </div>
           </aside>
@@ -352,6 +352,6 @@ export default function HotelDetailPage() {
 }
 
 function getAmenityIcon(amenity) {
-  const map = { wifi: '📶', pool: '🏊', gym: '💪', parking: '🅿️', spa: '💆', restaurant: '🍽️', bar: '🍸', ac: '❄️', tv: '📺', laundry: '👕', breakfast: '🍳', elevator: '🛗', concierge: '🛎️', safe: '🔒' };
-  return map[amenity?.toLowerCase()] || '✨';
+  const map = { wifi: '', pool: '', gym: '', parking: '', spa: '', restaurant: '', bar: '', ac: '', tv: '', laundry: '', breakfast: '', elevator: '', concierge: '', safe: '' };
+  return map[amenity?.toLowerCase()] || '';
 }

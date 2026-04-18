@@ -1,5 +1,5 @@
 /**
- * ─── PricingStrategyFactory ────────────────────────────────────────────────────
+ *  PricingStrategyFactory 
  *
  * Design Pattern: Factory
  * Responsibility: Given a DB PricingRule document, instantiate and return

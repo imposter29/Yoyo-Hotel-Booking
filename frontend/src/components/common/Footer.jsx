@@ -31,10 +31,10 @@ export default function Footer() {
     try {
       const { newsletterAPI } = await import('../../services/api');
       await newsletterAPI.subscribe(email);
-      setSubMsg('✅ Subscribed successfully!');
+      setSubMsg(' Subscribed successfully!');
       setEmail('');
     } catch {
-      setSubMsg('⚠️ Already subscribed or error occurred.');
+      setSubMsg(' Already subscribed or error occurred.');
     }
     setTimeout(() => setSubMsg(''), 4000);
   };
@@ -80,7 +80,7 @@ export default function Footer() {
               <div className="footer-cities-grid">
                 <div className="footer-city-item">
                   <a href="#" className="footer-city-link footer-city-link--special">
-                    📍 Hotels near me
+                     Hotels near me
                   </a>
                 </div>
                 {cities.map((city) => (

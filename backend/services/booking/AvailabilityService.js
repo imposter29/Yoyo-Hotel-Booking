@@ -1,7 +1,7 @@
 const InventoryCalendar = require('../../models/InventoryCalendar');
 const Room = require('../../models/Room');
 
-// ─── Utility ──────────────────────────────────────────────────────────────────
+//  Utility 
 
 /** Strip time → local midnight (matches how the seeder stored dates) */
 function toLocalMidnight(date) {

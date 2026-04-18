@@ -28,7 +28,7 @@ export function ToastProvider({ children }) {
             className={`toast${t.type === 'error' ? ' error' : ''}`}
             role="alert"
           >
-            <span>{t.type === 'error' ? '❌' : '✅'}</span>
+            <span>{t.type === 'error' ? '' : ''}</span>
             <span style={{ flex: 1 }}>{t.message}</span>
             <button
               onClick={() => removeToast(t.id)}

@@ -10,7 +10,7 @@ const InventoryCalendar = require('../models/InventoryCalendar');
 function startHoldExpiryJob() {
   cron.schedule('*/5 * * * *', async () => {
     const now = new Date();
-    console.log(`🔄 [HoldExpiryJob] Running at ${now.toISOString()}`);
+    console.log(` [HoldExpiryJob] Running at ${now.toISOString()}`);
 
     const expiredHolds = await Booking.find({
       status: 'hold',
@@ -31,14 +31,14 @@ function startHoldExpiryJob() {
           );
         }
 
-        console.log(`✅ Expired booking ${booking._id}, inventory released.`);
+        console.log(` Expired booking ${booking._id}, inventory released.`);
       } catch (err) {
-        console.error(`❌ Failed to expire booking ${booking._id}:`, err.message);
+        console.error(` Failed to expire booking ${booking._id}:`, err.message);
       }
     }
   });
 
-  console.log('🕐 Hold expiry job scheduled (every 5 minutes).');
+  console.log(' Hold expiry job scheduled (every 5 minutes).');
 }
 
 function getDateRange(checkIn, checkOut) {

@@ -99,7 +99,7 @@ const hotelSchema = new mongoose.Schema(
   }
 );
 
-// ─── Virtual: rooms (populated separately) ────────────────────────────────────
+//  Virtual: rooms (populated separately) 
 hotelSchema.virtual('rooms', {
   ref: 'Room',
   localField: '_id',
@@ -112,7 +112,7 @@ hotelSchema.virtual('roomTypes', {
   foreignField: 'hotel',
 });
 
-// ─── Pre-save: auto-generate slug ─────────────────────────────────────────────
+//  Pre-save: auto-generate slug 
 hotelSchema.pre('save', function (next) {
   if (this.isModified('name')) {
     this.slug = this.name
@@ -124,7 +124,7 @@ hotelSchema.pre('save', function (next) {
   next();
 });
 
-// ─── Index for geo queries ─────────────────────────────────────────────────────
+//  Index for geo queries 
 hotelSchema.index({ 'address.city': 1, isActive: 1 });
 hotelSchema.index({ starRating: 1 });
 

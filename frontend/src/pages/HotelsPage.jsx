@@ -23,7 +23,7 @@ function HotelCard({ hotel }) {
   const primaryImg = hotel.images?.find(i => i.isPrimary)?.url || hotel.images?.[0]?.url;
   const ratingStars = Math.round(hotel.averageRating || 0);
   const stars = Array.from({ length: 5 }, (_, i) => (
-    <span key={i} className={`star${i < ratingStars ? '' : ' empty'}`}>★</span>
+    <span key={i} className={`star${i < ratingStars ? '' : ' empty'}`}></span>
   ));
 
   return (
@@ -32,7 +32,7 @@ function HotelCard({ hotel }) {
         {primaryImg ? (
           <img src={primaryImg} alt={hotel.name} className="hotel-card-img" loading="lazy" />
         ) : (
-          <div className="hotel-card-img-placeholder" aria-label="No image available">🏨</div>
+          <div className="hotel-card-img-placeholder" aria-label="No image available"></div>
         )}
         {hotel.averageRating >= 4.2 && (
           <span className="hotel-card-badge">Top Rated</span>
@@ -41,7 +41,7 @@ function HotelCard({ hotel }) {
       <div className="hotel-card-body">
         <h3 className="hotel-card-name">{hotel.name}</h3>
         <div className="hotel-card-location">
-          📍 {hotel.address?.city}, {hotel.address?.country}
+           {hotel.address?.city}, {hotel.address?.country}
         </div>
         <div className="hotel-card-stars" aria-label={`${hotel.starRating} star hotel`}>
           <div className="stars">{stars}</div>
@@ -171,7 +171,7 @@ export default function HotelsPage() {
                   aria-pressed={filters.stars === s}
                   aria-label={s ? `${s} star hotels` : 'All ratings'}
                 >
-                  {s ? `${s}★` : 'All'}
+                  {s ? `${s}` : 'All'}
                 </button>
               ))}
             </div>
@@ -211,7 +211,7 @@ export default function HotelsPage() {
             </div>
           ) : hotels.length === 0 ? (
             <div className="hotels-empty" role="status">
-              <div className="empty-icon">🏨</div>
+              <div className="empty-icon"></div>
               <h3>No hotels found</h3>
               <p>Try adjusting your search or filter criteria.</p>
               <button className="btn btn-primary" onClick={() => setFilters({ search: '', stars: '', sortBy: 'rating' })}>

@@ -120,12 +120,12 @@ const bookingSchema = new mongoose.Schema(
   }
 );
 
-// ─── Virtual: booking reference number ────────────────────────────────────────
+//  Virtual: booking reference number 
 bookingSchema.virtual('referenceNumber').get(function () {
   return `YY-${this._id.toString().slice(-8).toUpperCase()}`;
 });
 
-// ─── Pre-save: compute derived fields ────────────────────────────────────────
+//  Pre-save: compute derived fields 
 bookingSchema.pre('save', function (next) {
   if (this.isNew && this.status === 'hold') {
     this.holdExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // +15 minutes
@@ -137,7 +137,7 @@ bookingSchema.pre('save', function (next) {
   next();
 });
 
-// ─── Method: state machine transitions ────────────────────────────────────────
+//  Method: state machine transitions 
 const VALID_TRANSITIONS = {
   hold: ['confirmed', 'cancelled', 'expired'],
   confirmed: ['checked_in', 'cancelled'],
@@ -159,7 +159,7 @@ bookingSchema.methods.transitionTo = function (newStatus) {
   if (newStatus === 'cancelled') this.cancelledAt = new Date();
 };
 
-// ─── Indexes ──────────────────────────────────────────────────────────────────
+//  Indexes 
 bookingSchema.index({ guest: 1, status: 1 });
 bookingSchema.index({ hotel: 1, status: 1 });
 bookingSchema.index({ holdExpiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL auto-delete

@@ -10,7 +10,7 @@
 
 const nodemailer = require('nodemailer');
 
-// ─── Transporter factory ──────────────────────────────────────────────────────
+//  Transporter factory 
 function createTransporter() {
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
@@ -28,7 +28,7 @@ function createTransporter() {
   return {
     sendMail: async (opts) => {
       console.log(
-        `📧 [DEV EMAIL — no SMTP configured]\n  To: ${opts.to}\n  Subject: ${opts.subject}\n  Body: ${opts.text || '(HTML only)'}`
+        ` [DEV EMAIL — no SMTP configured]\n  To: ${opts.to}\n  Subject: ${opts.subject}\n  Body: ${opts.text || '(HTML only)'}`
       );
       return { messageId: 'dev-mode' };
     },
@@ -37,7 +37,7 @@ function createTransporter() {
 
 const transporter = createTransporter();
 
-// ─── Generic send helper ──────────────────────────────────────────────────────
+//  Generic send helper 
 async function sendEmail({ to, subject, html, text }) {
   try {
     const info = await transporter.sendMail({
@@ -49,12 +49,12 @@ async function sendEmail({ to, subject, html, text }) {
     });
     return info;
   } catch (err) {
-    console.error('❌ Email send failed:', err.message);
+    console.error(' Email send failed:', err.message);
     // Never throw — email failures should not crash the request
   }
 }
 
-// ─── Templates ────────────────────────────────────────────────────────────────
+//  Templates 
 function bookingConfirmationEmail(booking, guest) {
   const refNum = `YY-${booking._id.toString().slice(-8).toUpperCase()}`;
   const checkIn = new Date(booking.checkIn).toDateString();
@@ -63,7 +63,7 @@ function bookingConfirmationEmail(booking, guest) {
   const html = `
     <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: #e63946; padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px;">Booking Confirmed! ✅</h1>
+        <h1 style="color: white; margin: 0; font-size: 28px;">Booking Confirmed! </h1>
       </div>
       <div style="background: #f8f9fa; padding: 32px; border-radius: 0 0 8px 8px;">
         <p style="font-size: 16px;">Hi ${guest.firstName},</p>
@@ -76,7 +76,7 @@ function bookingConfirmationEmail(booking, guest) {
           <tr><td style="padding: 10px; font-weight: 600;">Total Paid</td><td style="padding: 10px;">₹${booking.totalAmount.toLocaleString('en-IN')}</td></tr>
         </table>
         <p style="color: #666;">Manage your booking at <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/my-bookings">My Bookings</a>.</p>
-        <p>Thank you for choosing Yoyo Hotels! 🏨</p>
+        <p>Thank you for choosing Yoyo Hotels! </p>
       </div>
     </div>
   `;
@@ -120,7 +120,7 @@ function welcomeEmail(user) {
   const html = `
     <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: #e63946; padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Yoyo Hotels! 🏨</h1>
+        <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Yoyo Hotels! </h1>
       </div>
       <div style="background: #f8f9fa; padding: 32px; border-radius: 0 0 8px 8px;">
         <p>Hi ${user.firstName},</p>
@@ -141,7 +141,7 @@ function welcomeEmail(user) {
   };
 }
 
-// ─── Public notification functions ────────────────────────────────────────────
+//  Public notification functions 
 module.exports = {
   sendBookingConfirmation: (booking, guest) =>
     sendEmail(bookingConfirmationEmail(booking, guest)),

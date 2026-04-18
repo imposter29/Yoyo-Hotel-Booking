@@ -40,7 +40,7 @@ export default function LoginPage() {
 
         {error && (
           <div className="auth-error" role="alert" aria-live="polite">
-            ⚠️ {error}
+             {error}
           </div>
         )}
 

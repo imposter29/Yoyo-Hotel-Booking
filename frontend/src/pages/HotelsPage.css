@@ -9,7 +9,7 @@
   flex: 1;
 }
 
-/* ─── Sidebar ─────────────────────────────────────────────────────────────────── */
+/*  Sidebar  */
 .hotels-sidebar {
   width: 260px;
   flex-shrink: 0;
@@ -38,13 +38,13 @@
 }
 .star-filter-btn:hover, .star-filter-btn.active { border-color: #0f0f0f; color: #0f0f0f; background: #0f0f0f; color: white; }
 
-/* ─── Main ────────────────────────────────────────────────────────────────────── */
+/*  Main  */
 .hotels-main { flex: 1; min-width: 0; }
 .hotels-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 .hotels-count { font-size: 22px; font-weight: 700; color: #0f0f0f; }
 .hotels-location { color: #16a34a; }
 
-/* ─── Grid ────────────────────────────────────────────────────────────────────── */
+/*  Grid  */
 .hotels-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -52,7 +52,7 @@
   margin-bottom: 32px;
 }
 
-/* ─── Hotel Card ─────────────────────────────────────────────────────────────── */
+/*  Hotel Card  */
 .hotel-card {
   display: flex;
   flex-direction: column;
@@ -124,13 +124,13 @@
 .price-night { font-size: 12px; color: #737373; }
 .hotel-book-btn { font-size: 13px; }
 
-/* ─── Empty State ─────────────────────────────────────────────────────────────── */
+/*  Empty State  */
 .hotels-empty { text-align: center; padding: 80px 20px; }
 .empty-icon { font-size: 64px; margin-bottom: 16px; }
 .hotels-empty h3 { font-size: 22px; font-weight: 700; color: #0f0f0f; margin-bottom: 8px; }
 .hotels-empty p { font-size: 14px; color: #737373; margin-bottom: 24px; }
 
-/* ─── Pagination ─────────────────────────────────────────────────────────────── */
+/*  Pagination  */
 .pagination { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 24px 0; }
 .page-btn {
   padding: 10px 20px;
@@ -148,7 +148,7 @@
 .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .page-info { font-size: 14px; color: #737373; }
 
-/* ─── Responsive ─────────────────────────────────────────────────────────────── */
+/*  Responsive  */
 @media (max-width: 1024px) {
   .hotels-layout { flex-direction: column; }
   .hotels-sidebar { width: 100%; position: static; }

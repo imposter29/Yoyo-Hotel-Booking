@@ -4,7 +4,7 @@ const RoomType = require('../../models/RoomType');
 const PricingStrategyFactory = require('./PricingStrategyFactory');
 
 /**
- * ─── PricingContext ────────────────────────────────────────────────────────────
+ *  PricingContext 
  * Value object passed to every PricingStrategy.apply() call.
  * Encapsulates all runtime data strategies need to make a pricing decision.
  *
@@ -18,7 +18,7 @@ const PricingStrategyFactory = require('./PricingStrategyFactory');
  */
 
 /**
- * ─── YieldPricingEngine ───────────────────────────────────────────────────────
+ *  YieldPricingEngine 
  *
  * Design Patterns used:
  *   - Strategy   : each PricingStrategy subclass is interchangeable
@@ -161,7 +161,7 @@ class YieldPricingEngine {
   }
 }
 
-// ─── Singleton Export ──────────────────────────────────────────────────────────
+//  Singleton Export 
 // A single engine instance is created per request (stateless between requests).
 // bookingController calls: const { computePrice } = require('./YieldPricingEngine')
 // to maintain backward-compatible API with the controller.

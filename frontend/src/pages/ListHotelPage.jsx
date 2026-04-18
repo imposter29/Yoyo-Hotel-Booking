@@ -56,7 +56,7 @@ export default function ListHotelPage() {
     return (
       <div className="list-hotel-page">
         <div className="list-success-card">
-          <div className="list-success-icon">🎉</div>
+          <div className="list-success-icon"></div>
           <h2>Listing Submitted!</h2>
           <p>Your hotel has been submitted for review. Our team will verify the details and approve it within 1–2 business days.</p>
           <p className="list-success-note">You'll be able to manage your listing once approved.</p>
@@ -83,7 +83,7 @@ export default function ListHotelPage() {
       <div className="list-hero">
         <div className="container">
           <div className="list-hero-content">
-            <span className="list-hero-badge">🏨 Partner Program</span>
+            <span className="list-hero-badge"> Partner Program</span>
             <h1>List Your Hotel on Yoyo</h1>
             <p>Reach millions of travelers. Submit your property details and our team will review it within 48 hours.</p>
           </div>
@@ -101,7 +101,7 @@ export default function ListHotelPage() {
             ].map(s => (
               <div key={s.n} className={`list-step ${step === s.n ? 'active' : ''} ${step > s.n ? 'done' : ''}`}
                 onClick={() => setStep(s.n)} style={{ cursor: 'pointer' }}>
-                <div className="list-step-num">{step > s.n ? '✓' : s.n}</div>
+                <div className="list-step-num">{step > s.n ? '' : s.n}</div>
                 <span className="list-step-label">{s.label}</span>
               </div>
             ))}
@@ -109,7 +109,7 @@ export default function ListHotelPage() {
 
           <form onSubmit={handleSubmit} className="list-form">
 
-            {/* ── Step 1: Property Details ── */}
+            {/*  Step 1: Property Details  */}
             {step === 1 && (
               <div className="list-section">
                 <h3 className="list-section-title">Property Details</h3>
@@ -160,7 +160,7 @@ export default function ListHotelPage() {
                       {[1, 2, 3, 4, 5].map(s => (
                         <button key={s} type="button"
                           className={`star-btn ${form.starRating >= s ? 'active' : ''}`}
-                          onClick={() => set('starRating', s)}>★</button>
+                          onClick={() => set('starRating', s)}></button>
                       ))}
                       <span className="star-label">{form.starRating} Star{form.starRating > 1 ? 's' : ''}</span>
                     </div>
@@ -175,7 +175,7 @@ export default function ListHotelPage() {
               </div>
             )}
 
-            {/* ── Step 2: Rooms & Pricing ── */}
+            {/*  Step 2: Rooms & Pricing  */}
             {step === 2 && (
               <div className="list-section">
                 <h3 className="list-section-title">Rooms & Pricing</h3>
@@ -220,7 +220,7 @@ export default function ListHotelPage() {
               </div>
             )}
 
-            {/* ── Step 3: Policies & Submit ── */}
+            {/*  Step 3: Policies & Submit  */}
             {step === 3 && (
               <div className="list-section">
                 <h3 className="list-section-title">Policies</h3>
@@ -236,7 +236,7 @@ export default function ListHotelPage() {
                   <div className="list-field full">
                     <label style={stepLabel}>Property Policies</label>
                     <div className="policy-checks">
-                      {[['petFriendly', '🐾 Pet Friendly'], ['smokingAllowed', '🚬 Smoking Allowed']].map(([k, l]) => (
+                      {[['petFriendly', ' Pet Friendly'], ['smokingAllowed', ' Smoking Allowed']].map(([k, l]) => (
                         <label key={k} className={`policy-pill ${form[k] ? 'on' : ''}`}>
                           <input type="checkbox" style={{ display: 'none' }} checked={form[k]}
                             onChange={e => set(k, e.target.checked)} />
@@ -253,20 +253,20 @@ export default function ListHotelPage() {
                   <div className="list-review-grid">
                     <span>Hotel</span><strong>{form.name || '—'}</strong>
                     <span>City</span><strong>{form.city || '—'}</strong>
-                    <span>Stars</span><strong>{'★'.repeat(form.starRating)}</strong>
+                    <span>Stars</span><strong>{''.repeat(form.starRating)}</strong>
                     <span>Price/Night</span><strong>{form.pricePerNight ? `₹${form.pricePerNight}` : '—'}</strong>
                     <span>Rooms</span><strong>{form.totalRooms}</strong>
                     <span>Amenities</span><strong>{form.amenities.join(', ') || 'None'}</strong>
                   </div>
                   <p className="list-review-note">
-                    ⚠️ Your listing will be <strong>inactive</strong> until a Yoyo superadmin reviews and approves it.
+                     Your listing will be <strong>inactive</strong> until a Yoyo superadmin reviews and approves it.
                   </p>
                 </div>
 
                 <div className="list-nav">
                   <button type="button" className="btn btn-outline" onClick={() => setStep(2)}>← Back</button>
                   <button type="submit" className="btn btn-primary btn-lg" id="btn-list-submit" disabled={submitting}>
-                    {submitting ? 'Submitting…' : '🏨 Submit for Review'}
+                    {submitting ? 'Submitting…' : ' Submit for Review'}
                   </button>
                 </div>
               </div>

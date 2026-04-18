@@ -12,7 +12,7 @@ async function request(path, options = {}) {
   return data;
 }
 
-// ─── Auth ────────────────────────────────────────────────────────────────────
+//  Auth 
 export const authAPI = {
   register:       (body) => request('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
   login:          (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
@@ -22,7 +22,7 @@ export const authAPI = {
   changePassword: (body) => request('/auth/change-password', { method: 'PATCH', body: JSON.stringify(body) }),
 };
 
-// ─── Hotels ──────────────────────────────────────────────────────────────────
+//  Hotels 
 export const hotelsAPI = {
   search:  (params) => { const qs = new URLSearchParams(params).toString(); return request(`/hotels?${qs}`); },
   getAll:  (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/hotels?${qs}`); },
@@ -32,7 +32,7 @@ export const hotelsAPI = {
   delete:  (id) => request(`/hotels/${id}`, { method: 'DELETE' }),
 };
 
-// ─── Room Types ───────────────────────────────────────────────────────────────
+//  Room Types 
 export const roomTypesAPI = {
   getAll:   (hotelId) => request(`/room-types?hotelId=${hotelId}`),
   getById:  (id) => request(`/room-types/${id}`),
@@ -43,7 +43,7 @@ export const roomTypesAPI = {
   getRooms: (id) => request(`/room-types/${id}/rooms`),
 };
 
-// ─── Bookings ────────────────────────────────────────────────────────────────
+//  Bookings 
 export const bookingsAPI = {
   checkAvailability: (body) => request('/bookings/check', { method: 'POST', body: JSON.stringify(body) }),
   create:            (body) => request('/bookings', { method: 'POST', body: JSON.stringify(body) }),
@@ -52,7 +52,7 @@ export const bookingsAPI = {
   cancel:            (id, body = {}) => request(`/bookings/${id}/cancel`, { method: 'PATCH', body: JSON.stringify(body) }),
 };
 
-// ─── Payments ─────────────────────────────────────────────────────────────────
+//  Payments 
 export const paymentsAPI = {
   initiate:     (body) => request('/payments/initiate', { method: 'POST', body: JSON.stringify(body) }),
   confirm:      (paymentId) => request(`/payments/${paymentId}/confirm`, { method: 'POST' }),
@@ -60,7 +60,7 @@ export const paymentsAPI = {
   refund:       (paymentId) => request(`/payments/${paymentId}/refund`, { method: 'POST' }),
 };
 
-// ─── Reviews ─────────────────────────────────────────────────────────────────
+//  Reviews 
 export const reviewsAPI = {
   getAll:  (hotelId, params = {}) => {
     const qs = new URLSearchParams(params).toString();
@@ -70,13 +70,13 @@ export const reviewsAPI = {
   delete:  (hotelId, reviewId) => request(`/hotels/${hotelId}/reviews/${reviewId}`, { method: 'DELETE' }),
 };
 
-// ─── Cities ──────────────────────────────────────────────────────────────────
+//  Cities 
 export const citiesAPI = {
   getAll:   (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/cities?${qs}`); },
   getStats: () => request('/cities/stats'),
 };
 
-// ─── Deals ───────────────────────────────────────────────────────────────────
+//  Deals 
 export const dealsAPI = {
   getAll:  () => request('/deals'),
   getById: (id) => request(`/deals/${id}`),
@@ -85,14 +85,14 @@ export const dealsAPI = {
   delete:  (id) => request(`/deals/${id}`, { method: 'DELETE' }),
 };
 
-// ─── Newsletter ───────────────────────────────────────────────────────────────
+//  Newsletter 
 export const newsletterAPI = {
   subscribe:      (email) => request('/newsletter/subscribe', { method: 'POST', body: JSON.stringify({ email }) }),
   unsubscribe:    (email) => request('/newsletter/unsubscribe', { method: 'POST', body: JSON.stringify({ email }) }),
   getSubscribers: (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/newsletter/subscribers?${qs}`); },
 };
 
-// ─── Admin ────────────────────────────────────────────────────────────────────
+//  Admin 
 export const adminAPI = {
   getAnalytics:        () => request('/admin/analytics'),
   getUsers:            (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/admin/users?${qs}`); },
@@ -109,7 +109,7 @@ export const adminAPI = {
   updateHotelRooms:    (hotelId, totalRooms) => request(`/admin/hotels/${hotelId}/rooms`, { method: 'PATCH', body: JSON.stringify({ totalRooms }) }),
 };
 
-// ─── Hotel Listing Submission ─────────────────────────────────────────────────
+//  Hotel Listing Submission 
 export const listingAPI = {
   submit: (body) => request('/hotels/submit', { method: 'POST', body: JSON.stringify(body) }),
 };

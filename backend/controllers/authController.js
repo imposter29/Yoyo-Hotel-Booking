@@ -3,7 +3,7 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const notificationService = require('../services/notification/notificationService');
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.generateAuthToken();
   const cookieOptions = {
@@ -22,7 +22,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   });
 };
 
-// ─── Register ─────────────────────────────────────────────────────────────────
+//  Register 
 exports.register = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, email, password, phone, role } = req.body;
 
@@ -48,7 +48,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 201, res);
 });
 
-// ─── Login ────────────────────────────────────────────────────────────────────
+//  Login 
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) return next(new AppError('Please provide email and password.', 400));
@@ -62,18 +62,18 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-// ─── Logout ───────────────────────────────────────────────────────────────────
+//  Logout 
 exports.logout = asyncHandler(async (req, res) => {
   res.cookie('token', '', { expires: new Date(0), httpOnly: true });
   res.status(200).json({ success: true, message: 'Logged out successfully.' });
 });
 
-// ─── Get current user ─────────────────────────────────────────────────────────
+//  Get current user 
 exports.getMe = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: { user: req.user } });
 });
 
-// ─── Update profile ───────────────────────────────────────────────────────────
+//  Update profile 
 exports.updateProfile = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, phone } = req.body;
 
@@ -87,7 +87,7 @@ exports.updateProfile = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: { user } });
 });
 
-// ─── Change password ──────────────────────────────────────────────────────────
+//  Change password 
 exports.changePassword = asyncHandler(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
 
