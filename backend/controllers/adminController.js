@@ -424,11 +424,11 @@ exports.createAdminHotel = asyncHandler(async (req, res, next) => {
   //  4. Seed Inventory 
   const DAYS = Math.max(30, Math.min(Number(inventoryDays), 365));
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const utcToday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
   const inventoryDocs = [];
   for (let i = 0; i < DAYS; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
+    const date = new Date(utcToday);
+    date.setUTCDate(utcToday.getUTCDate() + i);
     inventoryDocs.push({
       hotel: hotel._id,
       roomType: roomType._id,

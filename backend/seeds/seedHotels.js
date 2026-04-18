@@ -148,10 +148,10 @@ function buildImages(row) {
 async function seedInventory(roomId, roomTypeId, days = 90) {
   const docs = [];
   const base = new Date();
-  base.setHours(0, 0, 0, 0);
+  const utcBase = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate()));
   for (let i = 0; i < days; i++) {
-    const date = new Date(base);
-    date.setDate(base.getDate() + i);
+    const date = new Date(utcBase);
+    date.setUTCDate(utcBase.getUTCDate() + i);
     docs.push({ room: roomId, roomType: roomTypeId, date, isAvailable: true });
   }
   await InventoryCalendar.insertMany(docs, { ordered: false }).catch(() => {});

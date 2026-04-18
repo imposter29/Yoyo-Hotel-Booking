@@ -3,21 +3,20 @@ const Room = require('../../models/Room');
 
 //  Utility 
 
-/** Strip time → local midnight (matches how the seeder stored dates) */
-function toLocalMidnight(date) {
+/** Strip time → UTC midnight (safe across timezones) */
+function toUTCMidnight(date) {
   const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
-/** Return array of local-midnight dates: [checkIn, checkIn+1, … checkOut-1] */
+/** Return array of UTC-midnight dates: [checkIn, checkIn+1, … checkOut-1] */
 function getDateRange(checkIn, checkOut) {
   const dates = [];
-  const current = toLocalMidnight(checkIn);
-  const end     = toLocalMidnight(checkOut);
+  const current = toUTCMidnight(checkIn);
+  const end     = toUTCMidnight(checkOut);
   while (current < end) {
     dates.push(new Date(current));
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
   }
   return dates;
 }
