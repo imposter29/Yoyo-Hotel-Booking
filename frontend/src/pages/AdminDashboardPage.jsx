@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { adminAPI, hotelsAPI, dealsAPI, listingAPI } from '../services/api';
+import { adminAPI, hotelsAPI, dealsAPI, listingAPI, reviewsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -536,15 +536,17 @@ function HotelsView() {
       <AdminCard>
         {loading ? <p style={{ color:'#a3a3a3' }}>Loading...</p> : (
           <AdminTable
-            headers={['Hotel', 'City', 'Stars', 'Rating', 'Rooms', 'Status', 'Actions']}
+            headers={['Hotel', 'City', 'Rating', 'Rooms', 'Status', 'Actions']}
             emptyMsg="No hotels yet. Click Add Hotel above!"
             rows={filteredHotels.map((h) => {
               const edit = roomEdits[h._id] || { value: 5, saving: false };
               return [
                 <Link to={`/hotels/${h._id}`} style={{ fontWeight:600, color:'#0f0f0f', fontSize:13 }}>{h.name}</Link>,
                 h.address?.city,
-                '★'.repeat(h.starRating || 3),
-                h.averageRating > 0 ? h.averageRating.toFixed(1) : '-',
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ color: '#f59e0b', fontSize: 14 }}>{'★'.repeat(h.starRating || 3)}</span>
+                  <span style={{ fontSize: 12, color: '#737373', fontWeight: 600 }}>{h.averageRating > 0 ? `${h.averageRating.toFixed(1)} / 5` : 'No reviews'}</span>
+                </div>,
                 <div style={{ display:'flex', alignItems:'center', gap:6 }}>
                   <input type="number" min={1} max={500} value={edit.value}
                     onChange={e => setRoomEdits(prev => ({ ...prev, [h._id]: { ...prev[h._id], value: e.target.value } }))}
@@ -638,6 +640,7 @@ function UsersView() {
 function DealsView() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingDealId, setEditingDealId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
   const { addToast } = useToast();
@@ -649,14 +652,33 @@ function DealsView() {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const data = await dealsAPI.create(form);
-      setDeals((ds) => [data.data.deal, ...ds]);
+      if (editingDealId) {
+        const data = await dealsAPI.update(editingDealId, form);
+        setDeals((ds) => ds.map((d) => d._id === editingDealId ? data.data.deal : d));
+        addToast('Deal updated!', 'success');
+      } else {
+        const data = await dealsAPI.create(form);
+        setDeals((ds) => [data.data.deal, ...ds]);
+        addToast('Deal created!', 'success');
+      }
       setShowForm(false);
+      setEditingDealId(null);
       setForm({ title: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
-      addToast('Deal created!', 'success');
     } catch (err) {
       addToast(err.message, 'error');
     }
+  };
+
+  const handleEditClick = (deal) => {
+    setEditingDealId(deal._id);
+    setForm({
+      title: deal.title, subtitle: deal.subtitle || '', tag: deal.tag || '',
+      discount: deal.discount || 0, type: deal.type || 'custom', ctaUrl: deal.ctaUrl || '/hotels',
+      expiresAt: deal.expiresAt ? new Date(deal.expiresAt).toISOString().slice(0, 16) : '',
+      bgColor: deal.bgColor || '#f8f9fa'
+    });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -674,14 +696,20 @@ function DealsView() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800 }}>Deals & Offers</h2>
-        <button className="btn btn-red btn-sm" onClick={() => setShowForm(!showForm)} id="btn-new-deal">
+        <button className="btn btn-red btn-sm" onClick={() => {
+          setShowForm(!showForm);
+          if (showForm) {
+            setEditingDealId(null);
+            setForm({ title: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
+          }
+        }} id="btn-new-deal">
           {showForm ? ' Cancel' : '＋ New Deal'}
         </button>
       </div>
 
       {showForm && (
         <AdminCard>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Create New Deal</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{editingDealId ? 'Update Deal' : 'Create New Deal'}</h3>
           <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             {[['title', 'Title *'], ['subtitle', 'Subtitle'], ['tag', 'Tag (e.g. WEEKEND DEAL)']].map(([k, l]) => (
               <div key={k} style={k === 'subtitle' ? { gridColumn: '1 / -1' } : {}}>
@@ -706,7 +734,7 @@ function DealsView() {
               <input type="color" className="form-input" style={{ height: 42, padding: 4 }} value={form.bgColor} onChange={(e) => setForm((f) => ({ ...f, bgColor: e.target.value }))} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <button type="submit" className="btn btn-primary" id="btn-create-deal">Create Deal</button>
+              <button type="submit" className="btn btn-primary" id="btn-create-deal">{editingDealId ? 'Update Deal' : 'Create Deal'}</button>
             </div>
           </form>
         </AdminCard>
@@ -722,9 +750,71 @@ function DealsView() {
               d.tag ? <span style={{ background: '#f5f5f5', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{d.tag}</span> : '—',
               d.discount > 0 ? <span className="badge badge-green">{d.discount}% off</span> : '—',
               new Date(d.expiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-              <button className="btn btn-sm" style={{ background: '#fef2f2', color: '#dc2626', border: '1.5px solid #fca5a5' }} onClick={() => handleDelete(d._id)}>Delete</button>,
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button className="btn btn-sm btn-outline" onClick={() => handleEditClick(d)} style={{ fontSize: 12 }}>Edit</button>
+                <button className="btn btn-sm" style={{ background: '#fef2f2', color: '#dc2626', border: '1.5px solid #fca5a5' }} onClick={() => handleDelete(d._id)}>Delete</button>
+              </div>,
             ])}
           />
+        )}
+      </AdminCard>
+    </div>
+  );
+}
+
+//  Reviews 
+function ReviewsView() {
+  const [reviews, setReviews] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    setLoading(true);
+    adminAPI.getReviews({ page, limit: 15 })
+      .then((d) => { setReviews(d.data?.reviews || []); setTotal(d.total || 0); setPages(d.pages || 1); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [page]);
+
+  const handleDelete = async (hotelId, reviewId) => {
+    if (!window.confirm('Delete this review permanently?')) return;
+    try {
+      await reviewsAPI.delete(hotelId, reviewId);
+      setReviews((rs) => rs.filter((r) => r._id !== reviewId));
+      setTotal(t => Math.max(0, t - 1));
+      addToast('Review deleted.', 'success');
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
+  };
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20 }}>Reviews <span style={{ fontSize: 14, color: '#737373', fontWeight: 400 }}>({total})</span></h2>
+      <AdminCard>
+        {loading ? <p style={{ color: '#a3a3a3' }}>Loading…</p> : (
+          <AdminTable
+            headers={['Guest', 'Hotel', 'Rating', 'Comment', 'Date', 'Action']}
+            emptyMsg="No reviews found."
+            rows={reviews.map((r) => [
+              `${r.guest?.firstName || ''} ${r.guest?.lastName || ''}`,
+              r.hotel?.name || 'Unknown',
+              <span style={{ color: '#f59e0b' }}>{'★'.repeat(r.rating || 0)}</span>,
+              <div style={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.comment}</div>,
+              new Date(r.createdAt).toLocaleDateString(),
+              <button className="btn btn-sm" style={{ background: '#fef2f2', color: '#dc2626', border: '1.5px solid #fca5a5' }} onClick={() => handleDelete(r.hotel?._id, r._id)}>Delete</button>,
+            ])}
+          />
+        )}
+        {pages > 1 && (
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
+            <button className="btn btn-outline btn-sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>← Prev</button>
+            <span style={{ padding: '6px 12px', fontSize: 14 }}>Page {page} / {pages}</span>
+            <button className="btn btn-outline btn-sm" disabled={page === pages} onClick={() => setPage((p) => p + 1)}>Next →</button>
+          </div>
         )}
       </AdminCard>
     </div>
@@ -738,6 +828,7 @@ const NAV_ITEMS = [
   { path: '/admin/hotels',    label: 'Hotels',    icon: '' },
   { path: '/admin/users',     label: 'Users',     icon: '' },
   { path: '/admin/deals',     label: 'Deals',     icon: '' },
+  { path: '/admin/reviews',   label: 'Reviews',   icon: '' },
 ];
 
 //  Main Dashboard shell 
@@ -761,7 +852,7 @@ export default function AdminDashboardPage() {
       <div style={{ borderBottom: '1px solid #e5e5e5', background: 'white', position: 'sticky', top: 60, zIndex: 10 }}>
         <div className="container">
           <div style={{ display: 'flex', gap: 0, overflowX: 'auto' }}>
-            {NAV_ITEMS.filter(item => isSuperAdmin || !['Users', 'Deals'].includes(item.label)).map((item) => {
+            {NAV_ITEMS.filter(item => isSuperAdmin || !['Users', 'Deals', 'Reviews'].includes(item.label)).map((item) => {
               const active = item.path === '/admin'
                 ? location.pathname === '/admin' || location.pathname === '/admin/analytics'
                 : location.pathname.startsWith(item.path);
@@ -796,6 +887,7 @@ export default function AdminDashboardPage() {
           <Route path="hotels"    element={<HotelsView />} />
           <Route path="users"     element={isSuperAdmin ? <UsersView /> : <Navigate to="/admin" />} />
           <Route path="deals"     element={isSuperAdmin ? <DealsView /> : <Navigate to="/admin" />} />
+          <Route path="reviews"   element={isSuperAdmin ? <ReviewsView /> : <Navigate to="/admin" />} />
         </Routes>
       </div>
     </div>
