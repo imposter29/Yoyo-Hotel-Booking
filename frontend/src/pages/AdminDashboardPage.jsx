@@ -1,8 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { adminAPI, hotelsAPI, dealsAPI, listingAPI, reviewsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
+
+
+//  Mini Calendar (reused from BookingPage) 
+const MONTHS_ADMIN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_LBL_ADMIN = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+function fmtAdmin(iso) {
+  if (!iso) return 'Select date';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+function AdminMiniCal({ value, minISO, onChange, onClose }) {
+  const init = value ? new Date(value + 'T00:00:00') : new Date();
+  const [yr, setYr] = useState(init.getFullYear());
+  const [mo, setMo] = useState(init.getMonth());
+  const pMo = () => { if (mo===0){setYr(y=>y-1);setMo(11);}else setMo(m=>m-1); };
+  const nMo = () => { if (mo===11){setYr(y=>y+1);setMo(0);}else setMo(m=>m+1); };
+  const first = new Date(yr, mo, 1).getDay();
+  const dim   = new Date(yr, mo+1, 0).getDate();
+  const cells = Array(first).fill(null).concat(Array.from({length:dim},(_,i)=>i+1));
+  const isoOf = d => `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  return (
+    <div style={{ position:'absolute', top:'calc(100% + 8px)', left:0, background:'white', borderRadius:14,
+      boxShadow:'0 12px 40px rgba(0,0,0,0.18)', padding:16, zIndex:2000, width:280 }}
+      onClick={e=>e.stopPropagation()}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+        <button type="button" onClick={pMo} style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', padding:'2px 8px', borderRadius:6 }}>‹</button>
+        <span style={{ fontWeight:700, fontSize:14 }}>{MONTHS_ADMIN[mo]} {yr}</span>
+        <button type="button" onClick={nMo} style={{ background:'none', border:'none', fontSize:20, cursor:'pointer', padding:'2px 8px', borderRadius:6 }}>›</button>
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2 }}>
+        {DAY_LBL_ADMIN.map(d=><span key={d} style={{ textAlign:'center', fontSize:11, fontWeight:600, color:'#a3a3a3', padding:'4px 0' }}>{d}</span>)}
+        {cells.map((d,i)=>{
+          if(!d) return <span key={`e${i}`}/>;
+          const iso=isoOf(d), disabled=minISO&&iso<minISO, selected=iso===value;
+          return <button key={iso} type="button" disabled={disabled}
+            onClick={()=>{onChange(iso);onClose();}}
+            style={{ background:selected?'#ef4444':'none', color:disabled?'#d4d4d4':selected?'white':'#0f0f0f',
+              border:'none', borderRadius:6, fontSize:13, fontWeight:selected?700:500,
+              padding:'6px 4px', cursor:disabled?'not-allowed':'pointer', textAlign:'center', fontFamily:'inherit' }}>{d}</button>;
+        })}
+      </div>
+    </div>
+  );
+}
+function AdminDateField({ id, label, value, minISO, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(()=>{
+    const h=(e)=>{ if(ref.current&&!ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown',h);
+    return ()=>document.removeEventListener('mousedown',h);
+  },[]);
+  return (
+    <div ref={ref} style={{ position:'relative' }}>
+      <label style={{ display:'block', fontSize:12, fontWeight:600, color:'#737373', marginBottom:4 }} htmlFor={id}>{label}</label>
+      <button type="button" id={id}
+        onClick={()=>setOpen(o=>!o)}
+        style={{ width:'100%', textAlign:'left', background:'white', border:'1.5px solid #e5e5e5',
+          borderRadius:8, padding:'10px 14px', fontSize:14, fontWeight:600, color: value ? '#0f0f0f' : '#a3a3a3',
+          cursor:'pointer', fontFamily:'inherit', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        {fmtAdmin(value)}
+        <span style={{ fontSize:16, color:'#a3a3a3' }}>📅</span>
+      </button>
+      {open && <AdminMiniCal value={value} minISO={minISO} onChange={onChange} onClose={()=>setOpen(false)} />}
+    </div>
+  );
+}
 
 //  Shared helpers 
 const STATUS_CONFIG = {
@@ -674,7 +741,7 @@ function DealsView() {
     setForm({
       title: deal.title, subtitle: deal.subtitle || '', tag: deal.tag || '',
       discount: deal.discount || 0, type: deal.type || 'custom', ctaUrl: deal.ctaUrl || '/hotels',
-      expiresAt: deal.expiresAt ? new Date(deal.expiresAt).toISOString().slice(0, 16) : '',
+      expiresAt: deal.expiresAt ? new Date(deal.expiresAt).toISOString().split('T')[0] : '',
       bgColor: deal.bgColor || '#f8f9fa'
     });
     setShowForm(true);
@@ -721,17 +788,40 @@ function DealsView() {
               <label style={{ fontSize: 12, fontWeight: 600, color: '#737373', display: 'block', marginBottom: 4 }}>Discount %</label>
               <input type="number" min={0} max={100} className="form-input" value={form.discount} onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value }))} />
             </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#737373', display: 'block', marginBottom: 4 }}>Expires At *</label>
-              <input type="datetime-local" className="form-input" value={form.expiresAt} onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))} required />
-            </div>
+            <AdminDateField
+              id="deal-expires-at"
+              label="Expires At *"
+              value={form.expiresAt}
+              minISO={new Date().toISOString().split('T')[0]}
+              onChange={(iso) => setForm((f) => ({ ...f, expiresAt: iso }))}
+            />
             <div>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#737373', display: 'block', marginBottom: 4 }}>CTA URL</label>
               <input className="form-input" value={form.ctaUrl} onChange={(e) => setForm((f) => ({ ...f, ctaUrl: e.target.value }))} />
             </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#737373', display: 'block', marginBottom: 4 }}>Background Color</label>
-              <input type="color" className="form-input" style={{ height: 42, padding: 4 }} value={form.bgColor} onChange={(e) => setForm((f) => ({ ...f, bgColor: e.target.value }))} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#737373', display: 'block', marginBottom: 8 }}>Background Color</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {['#f8f9fa','#fff7ed','#fef2f2','#f0fdf4','#eff6ff','#faf5ff','#0f0f0f','#1e293b','#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899','#14b8a6'].map(color => (
+                  <button
+                    key={color}
+                    type="button"
+                    title={color}
+                    onClick={() => setForm(f => ({ ...f, bgColor: color }))}
+                    style={{
+                      width: 32, height: 32, borderRadius: 8, background: color,
+                      border: form.bgColor === color ? '3px solid #0f0f0f' : '2px solid #e5e5e5',
+                      cursor: 'pointer', flexShrink: 0,
+                      boxShadow: form.bgColor === color ? '0 0 0 2px white inset' : 'none',
+                      transition: 'transform 0.1s',
+                    }}
+                  />
+                ))}
+              </div>
+              <div style={{ marginTop: 8, fontSize: 12, color: '#737373', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 18, height: 18, borderRadius: 4, background: form.bgColor, border: '1px solid #e5e5e5', display: 'inline-block', flexShrink: 0 }} />
+                Selected: {form.bgColor}
+              </div>
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <button type="submit" className="btn btn-primary" id="btn-create-deal">{editingDealId ? 'Update Deal' : 'Create Deal'}</button>
