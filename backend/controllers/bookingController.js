@@ -181,7 +181,6 @@ exports.applyCoupon = asyncHandler(async (req, res, next) => {
 
   if (!deal) return next(new AppError('Invalid or expired coupon code.', 400));
 
-  const originalAmount = booking.items.reduce((sum, item) => sum + item.totalPrice, 0);
   const discountAmount = Math.round((originalAmount * deal.discount) / 100);
   
   booking.discountAmount = discountAmount;
