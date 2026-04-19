@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getDeals,
   getDeal,
+  validateDeal,
   createDeal,
   updateDeal,
   deleteDeal,
@@ -11,6 +12,7 @@ const { protect, authorize } = require('../middleware/auth');
 
 // Public
 router.get('/', getDeals);
+router.get('/validate/:code', validateDeal);
 router.get('/:id', getDeal);
 
 // Admin only

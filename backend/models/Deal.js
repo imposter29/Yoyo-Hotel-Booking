@@ -8,6 +8,14 @@ const dealSchema = new mongoose.Schema(
       trim: true,
       maxlength: [120, 'Title cannot exceed 120 characters'],
     },
+    code: {
+      type: String,
+      required: [true, 'Deal code is required'],
+      unique: true,
+      trim: true,
+      uppercase: true,
+      maxlength: [20, 'Code cannot exceed 20 characters'],
+    },
     subtitle: {
       type: String,
       maxlength: [300, 'Subtitle cannot exceed 300 characters'],

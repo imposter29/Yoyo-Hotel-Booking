@@ -1,5 +1,6 @@
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
+const Deal = require('../models/Deal');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const notificationService = require('../services/notification/notificationService');
@@ -23,7 +24,7 @@ function computeRefund(booking) {
 //  @route POST /api/v1/payments/initiate
 //  @access Private (guest)
 exports.initiatePayment = asyncHandler(async (req, res, next) => {
-  const { bookingId, paymentMethod = 'test' } = req.body;
+  const { bookingId, paymentMethod = 'test', dealCode } = req.body;
 
   const booking = await Booking.findById(bookingId);
   if (!booking) return next(new AppError('Booking not found.', 404));
@@ -49,15 +50,49 @@ exports.initiatePayment = asyncHandler(async (req, res, next) => {
     return next(new AppError('Booking hold has expired. Please start a new booking.', 410));
   }
 
+  const originalAmount = booking.items.reduce((sum, item) => sum + item.totalPrice, 0);
+  let amount = originalAmount;
+  let appliedDeal = null;
+
+  if (dealCode) {
+    const deal = await Deal.findOne({
+      code: dealCode.toUpperCase(),
+      isActive: true,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (deal) {
+      const discountAmount = Math.round((originalAmount * deal.discount) / 100);
+      amount = originalAmount - discountAmount;
+      appliedDeal = {
+        code: deal.code,
+        discount: deal.discount,
+        discountAmount,
+      };
+      
+      // Update booking with discount info
+      booking.discountAmount = discountAmount;
+      booking.couponCode = deal.code;
+      booking.totalAmount = amount;
+      await booking.save();
+    } else {
+      return next(new AppError('Invalid or expired coupon code.', 400));
+    }
+  } else {
+    // If no dealCode provided, but booking already has a discount, ensure we use the correct amount
+    amount = booking.totalAmount;
+  }
+
   // Create a pending payment record
   const payment = await Payment.create({
     booking: booking._id,
-    amount: booking.totalAmount,
+    amount: amount,
     currency: booking.currency,
     status: 'pending',
     gatewayProvider: 'mock',
     gatewayOrderId: `mock_ord_${booking._id}`,
     paymentMethod,
+    metadata: appliedDeal ? { appliedDeal } : {},
   });
 
   res.status(201).json({

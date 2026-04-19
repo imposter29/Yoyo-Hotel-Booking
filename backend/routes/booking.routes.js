@@ -6,6 +6,7 @@ const {
   getMyBookings,
   getBooking,
   cancelBooking,
+  applyCoupon,
 } = require('../controllers/bookingController');
 const { protect, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validate');
@@ -25,5 +26,6 @@ router.post('/', authorize('guest'), validate(createBookingSchema), createBookin
 router.get('/my', getMyBookings);
 router.get('/:id', getBooking);
 router.patch('/:id/cancel', validate(cancelBookingSchema), cancelBooking);
+router.patch('/:id/apply-coupon', applyCoupon);
 
 module.exports = router;

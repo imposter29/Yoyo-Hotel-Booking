@@ -146,3 +146,56 @@ exports.cancelBooking = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, data: { booking } });
 });
+
+// @desc  Apply a coupon to a booking
+// @route PATCH /api/bookings/:id/apply-coupon
+// @access Private
+exports.applyCoupon = asyncHandler(async (req, res, next) => {
+  const { code } = req.body;
+  const booking = await Booking.findById(req.params.id);
+  if (!booking) return next(new AppError('Booking not found.', 404));
+  if (!booking.guest.equals(req.user._id)) return next(new AppError('Not authorized.', 403));
+  if (booking.status !== 'hold') return next(new AppError('Coupons can only be applied to bookings on hold.', 400));
+
+  const originalAmount = booking.items.reduce((sum, item) => sum + item.totalPrice, 0);
+
+  // If code is empty, remove coupon
+  if (!code) {
+    booking.discountAmount = 0;
+    booking.couponCode = undefined;
+    booking.totalAmount = originalAmount;
+    await booking.save();
+    return res.status(200).json({
+      success: true,
+      message: 'Coupon removed.',
+      data: { totalAmount: booking.totalAmount, discountAmount: 0, couponCode: null },
+    });
+  }
+
+  const Deal = require('../models/Deal');
+  const deal = await Deal.findOne({
+    code: code.toUpperCase(),
+    isActive: true,
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!deal) return next(new AppError('Invalid or expired coupon code.', 400));
+
+  const originalAmount = booking.items.reduce((sum, item) => sum + item.totalPrice, 0);
+  const discountAmount = Math.round((originalAmount * deal.discount) / 100);
+  
+  booking.discountAmount = discountAmount;
+  booking.couponCode = deal.code;
+  booking.totalAmount = originalAmount - discountAmount;
+  await booking.save();
+
+  res.status(200).json({
+    success: true,
+    message: `Coupon "${deal.code}" applied successfully.`,
+    data: {
+      totalAmount: booking.totalAmount,
+      discountAmount: booking.discountAmount,
+      couponCode: booking.couponCode,
+    },
+  });
+});

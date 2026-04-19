@@ -54,6 +54,7 @@ export const bookingsAPI = {
   getMyBookings:     () => request('/bookings/my'),
   getById:           (id) => request(`/bookings/${id}`),
   cancel:            (id, body = {}) => request(`/bookings/${id}/cancel`, { method: 'PATCH', body: JSON.stringify(body) }),
+  applyCoupon:       (id, code) => request(`/bookings/${id}/apply-coupon`, { method: 'PATCH', body: JSON.stringify({ code }) }),
 };
 
 //  Payments 
@@ -82,11 +83,12 @@ export const citiesAPI = {
 
 //  Deals 
 export const dealsAPI = {
-  getAll:  () => request('/deals'),
-  getById: (id) => request(`/deals/${id}`),
-  create:  (body) => request('/deals', { method: 'POST', body: JSON.stringify(body) }),
-  update:  (id, body) => request(`/deals/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
-  delete:  (id) => request(`/deals/${id}`, { method: 'DELETE' }),
+  getAll:   () => request('/deals'),
+  getById:  (id) => request(`/deals/${id}`),
+  validate: (code) => request(`/deals/validate/${code}`),
+  create:   (body) => request('/deals', { method: 'POST', body: JSON.stringify(body) }),
+  update:   (id, body) => request(`/deals/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  delete:   (id) => request(`/deals/${id}`, { method: 'DELETE' }),
 };
 
 //  Newsletter 

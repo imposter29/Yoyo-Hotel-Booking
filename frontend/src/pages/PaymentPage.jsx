@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { paymentsAPI, bookingsAPI } from '../services/api';
+import { paymentsAPI, bookingsAPI, dealsAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 const METHODS = [
@@ -196,18 +196,78 @@ export default function PaymentPage() {
   const [step, setStep]         = useState('select'); // select | form | processing
   const [error, setError]       = useState('');
 
+  // Coupon state
+  const [coupon, setCoupon]       = useState('');
+  const [appliedDeal, setAppliedDeal] = useState(null);
+  const [applying, setApplying]   = useState(false);
+
+  // Available deals list
+  const [availableDeals, setAvailableDeals] = useState([]);
+  const [loadingDeals, setLoadingDeals]   = useState(true);
+
   useEffect(() => {
     bookingsAPI.getById(bookingId)
-      .then(d => setBooking(d.data?.booking))
+      .then(d => {
+        const b = d.data?.booking;
+        setBooking(b);
+        // If booking already has a discount applied (e.g. from a previous attempt)
+        if (b?.discountAmount) {
+          setAppliedDeal({ code: 'APPLIED', discount: 0, discountAmount: b.discountAmount });
+        }
+      })
       .catch(() => setError('Could not load booking.'))
       .finally(() => setLoading(false));
+
+    // Fetch available deals
+    dealsAPI.getAll()
+      .then(d => setAvailableDeals(d.data?.deals || []))
+      .catch(() => {})
+      .finally(() => setLoadingDeals(false));
   }, [bookingId]);
+
+  const handleApplyCoupon = async () => {
+    if (!coupon) return;
+    setApplying(true);
+    try {
+      const res = await bookingsAPI.applyCoupon(bookingId, coupon);
+      setAppliedDeal({
+        code: res.data.couponCode,
+        discountAmount: res.data.discountAmount
+      });
+      // Update local booking state to reflect the new totalAmount
+      setBooking(prev => ({ ...prev, totalAmount: res.data.totalAmount, discountAmount: res.data.discountAmount, couponCode: res.data.couponCode }));
+      addToast(`Coupon "${res.data.couponCode}" applied!`, 'success');
+    } catch (err) {
+      addToast(err.message || 'Invalid coupon', 'error');
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    setApplying(true);
+    try {
+      const res = await bookingsAPI.applyCoupon(bookingId, '');
+      setAppliedDeal(null);
+      setCoupon('');
+      setBooking(prev => ({ ...prev, totalAmount: res.data.totalAmount, discountAmount: 0, couponCode: null }));
+      addToast('Coupon removed.', 'info');
+    } catch (err) {
+      addToast(err.message || 'Failed to remove coupon', 'error');
+    } finally {
+      setApplying(false);
+    }
+  };
 
   // Step 1: initiate payment (creates payment record)
   const handleInitiate = async () => {
     setBusy(true); setError('');
     try {
-      const d = await paymentsAPI.initiate({ bookingId, paymentMethod: method });
+      const d = await paymentsAPI.initiate({ 
+        bookingId, 
+        paymentMethod: method,
+        dealCode: appliedDeal?.code 
+      });
       setPaymentId(d.data.paymentId);
       setStep('form');
     } catch (err) {
@@ -239,6 +299,10 @@ export default function PaymentPage() {
   const checkIn  = booking ? new Date(booking.checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const checkOut = booking ? new Date(booking.checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
+  const originalTotal = booking?.items?.reduce((acc, item) => acc + item.totalPrice, 0) || booking?.totalAmount || 0;
+  const discountVal  = appliedDeal ? (appliedDeal.discountAmount || (originalTotal * appliedDeal.discount / 100)) : 0;
+  const finalTotal    = originalTotal - discountVal;
+
   return (
     <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '40px 16px', background: '#f8f9fa' }} id="payment-page">
@@ -267,11 +331,72 @@ export default function PaymentPage() {
                   <span style={{ fontWeight: 600 }}>{v}</span>
                 </div>
               ))}
+
+              {appliedDeal && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14, color: '#16a34a', fontWeight: 600 }}>
+                  <span>Discount ({appliedDeal.code})</span>
+                  <span>-₹{discountVal.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+
               <hr style={{ border: 'none', borderTop: '1px solid #e5e5e5', margin: '12px 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800 }}>
                 <span>Total</span>
-                <span style={{ color: '#ef4444' }}>₹{booking.totalAmount?.toLocaleString('en-IN')}</span>
+                <span style={{ color: '#ef4444' }}>₹{finalTotal.toLocaleString('en-IN')}</span>
               </div>
+            </div>
+          )}
+
+          {/* Coupon Section */}
+          {step === 'select' && (
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ ...labelStyle, color: '#737373' }}>Have a Promo Code?</label>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <input 
+                  style={{ ...inputStyle(), flex: 1, textTransform: 'uppercase' }} 
+                  placeholder="ENTER CODE"
+                  value={coupon}
+                  onChange={(e) => setCoupon(e.target.value.toUpperCase())}
+                  disabled={appliedDeal}
+                />
+                <button 
+                  className="btn btn-outline" 
+                  style={{ padding: '0 20px', borderRadius: 8, fontSize: 13, height: 42 }}
+                  onClick={appliedDeal ? handleRemoveCoupon : handleApplyCoupon}
+                  disabled={applying || (!coupon && !appliedDeal)}
+                >
+                  {applying ? '...' : appliedDeal ? 'Remove' : 'Apply'}
+                </button>
+              </div>
+
+              {/* Available Deals List */}
+              {!appliedDeal && availableDeals.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#a3a3a3', marginBottom: 10, textTransform: 'uppercase' }}>Available Offers</div>
+                  <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
+                    {availableDeals.map(d => (
+                      <div 
+                        key={d._id}
+                        onClick={() => { setCoupon(d.code); }}
+                        style={{ 
+                          flexShrink: 0, width: 200, padding: 12, borderRadius: 10, 
+                          background: d.bgColor || '#f8f9fa', border: '1.5px dashed #e5e5e5',
+                          cursor: 'pointer', transition: 'transform 0.2s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                      >
+                        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{d.title}</div>
+                        <div style={{ fontSize: 11, color: '#737373', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.subtitle}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: '#ef4444' }}>{d.code}</span>
+                          <span style={{ fontSize: 10, background: 'white', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>{d.discount}% OFF</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -309,7 +434,7 @@ export default function PaymentPage() {
               </div>
               <button className="btn btn-red btn-xl" style={{ width: '100%', borderRadius: 10 }}
                 onClick={handleInitiate} disabled={busy} id="btn-initiate-payment">
-                {busy ? 'Initiating...' : `Pay ₹${booking?.totalAmount?.toLocaleString('en-IN')}`}
+                {busy ? 'Initiating...' : `Pay ₹${finalTotal.toLocaleString('en-IN')}`}
               </button>
             </>
           )}

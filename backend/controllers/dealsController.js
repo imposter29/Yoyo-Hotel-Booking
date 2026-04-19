@@ -16,6 +16,28 @@ exports.getDeals = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, total: deals.length, data: { deals } });
 });
 
+//  @desc  Validate a deal code 
+//  @route GET /api/v1/deals/validate/:code
+//  @access Public
+exports.validateDeal = asyncHandler(async (req, res, next) => {
+  const deal = await Deal.findOne({
+    code: req.params.code.toUpperCase(),
+    isActive: true,
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!deal) return next(new AppError('Invalid or expired coupon code.', 404));
+
+  res.status(200).json({
+    success: true,
+    data: {
+      code: deal.code,
+      discount: deal.discount,
+      title: deal.title,
+    },
+  });
+});
+
 //  @desc  Get a single deal 
 //  @route GET /api/v1/deals/:id
 //  @access Public

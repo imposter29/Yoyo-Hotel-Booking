@@ -709,7 +709,7 @@ function DealsView() {
   const [loading, setLoading] = useState(true);
   const [editingDealId, setEditingDealId] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
+  const [form, setForm] = useState({ title: '', code: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -730,7 +730,7 @@ function DealsView() {
       }
       setShowForm(false);
       setEditingDealId(null);
-      setForm({ title: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
+      setForm({ title: '', code: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
     } catch (err) {
       addToast(err.message, 'error');
     }
@@ -739,7 +739,7 @@ function DealsView() {
   const handleEditClick = (deal) => {
     setEditingDealId(deal._id);
     setForm({
-      title: deal.title, subtitle: deal.subtitle || '', tag: deal.tag || '',
+      title: deal.title, code: deal.code || '', subtitle: deal.subtitle || '', tag: deal.tag || '',
       discount: deal.discount || 0, type: deal.type || 'custom', ctaUrl: deal.ctaUrl || '/hotels',
       expiresAt: deal.expiresAt ? new Date(deal.expiresAt).toISOString().split('T')[0] : '',
       bgColor: deal.bgColor || '#f8f9fa'
@@ -767,7 +767,7 @@ function DealsView() {
           setShowForm(!showForm);
           if (showForm) {
             setEditingDealId(null);
-            setForm({ title: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
+            setForm({ title: '', code: '', subtitle: '', tag: '', discount: 0, type: 'custom', ctaUrl: '/hotels', expiresAt: '', bgColor: '#f8f9fa' });
           }
         }} id="btn-new-deal">
           {showForm ? ' Cancel' : '＋ New Deal'}
@@ -778,10 +778,10 @@ function DealsView() {
         <AdminCard>
           <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{editingDealId ? 'Update Deal' : 'Create New Deal'}</h3>
           <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            {[['title', 'Title *'], ['subtitle', 'Subtitle'], ['tag', 'Tag (e.g. WEEKEND DEAL)']].map(([k, l]) => (
+            {[['title', 'Title *'], ['code', 'Promo Code *'], ['subtitle', 'Subtitle'], ['tag', 'Tag (e.g. WEEKEND DEAL)']].map(([k, l]) => (
               <div key={k} style={k === 'subtitle' ? { gridColumn: '1 / -1' } : {}}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#737373', display: 'block', marginBottom: 4 }}>{l}</label>
-                <input className="form-input" value={form[k]} onChange={(e) => setForm((f) => ({ ...f, [k]: e.target.value }))} required={k === 'title'} />
+                <input className="form-input" value={form[k]} onChange={(e) => setForm((f) => ({ ...f, [k]: e.target.value }))} required={k === 'title' || k === 'code'} />
               </div>
             ))}
             <div>

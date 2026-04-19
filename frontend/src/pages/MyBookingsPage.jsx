@@ -54,8 +54,17 @@ function BookingCard({ booking, onCancel }) {
 
       <div className="booking-card-footer">
         <div className="booking-price-total">
-          <span className="booking-price-label">Total</span>
-          <span className="booking-price-amt">₹{booking.totalAmount?.toLocaleString('en-IN') || '—'}</span>
+          <span className="booking-price-label">Total Amount</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            {booking.discountAmount > 0 && (
+              <span style={{ fontSize: 12, color: '#a3a3a3', textDecoration: 'line-through', marginBottom: -2 }}>
+                ₹{(booking.totalAmount + booking.discountAmount).toLocaleString('en-IN')}
+              </span>
+            )}
+            <span className="booking-price-amt" style={{ color: booking.discountAmount > 0 ? '#16a34a' : 'inherit' }}>
+              ₹{booking.totalAmount?.toLocaleString('en-IN') || '—'}
+            </span>
+          </div>
         </div>
         <div className="booking-actions">
           {needsPayment && (

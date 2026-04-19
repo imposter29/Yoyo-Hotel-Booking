@@ -86,6 +86,15 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
+    couponCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
+    },
     // Hold valid for 15 minutes after creation
     holdValidUntil: {
       type: Date,
