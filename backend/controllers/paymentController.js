@@ -43,7 +43,7 @@ exports.initiatePayment = asyncHandler(async (req, res, next) => {
   }
 
   // Check hold hasn't expired
-  if (booking.holdExpiresAt && new Date() > booking.holdExpiresAt) {
+  if (booking.holdValidUntil && new Date() > booking.holdValidUntil) {
     booking.transitionTo('expired');
     await booking.save();
     return next(new AppError('Booking hold has expired. Please start a new booking.', 410));
@@ -107,6 +107,7 @@ exports.confirmPayment = asyncHandler(async (req, res, next) => {
 
   // Transition booking to confirmed
   booking.transitionTo('confirmed');
+  booking.holdValidUntil = undefined; // Clear hold TTL on confirmation
   booking.payment = payment._id;
   await booking.save();
 

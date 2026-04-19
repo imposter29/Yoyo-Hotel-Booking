@@ -86,8 +86,8 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    // Hold expires 15 minutes after creation
-    holdExpiresAt: {
+    // Hold valid for 15 minutes after creation
+    holdValidUntil: {
       type: Date,
     },
     // Special guest requests
@@ -128,7 +128,7 @@ bookingSchema.virtual('referenceNumber').get(function () {
 //  Pre-save: compute derived fields 
 bookingSchema.pre('save', function (next) {
   if (this.isNew && this.status === 'hold') {
-    this.holdExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // +15 minutes
+    this.holdValidUntil = new Date(Date.now() + 15 * 60 * 1000); // +15 minutes
   }
   if (this.checkIn && this.checkOut) {
     const msPerDay = 1000 * 60 * 60 * 24;

@@ -59,8 +59,8 @@ export function AuthProvider({ children }) {
     return data.data?.user;
   };
 
-  const logout = () => {
-    authAPI.logout();
+  const logout = async () => {
+    await authAPI.logout();
     dispatch({ type: 'LOGOUT' });
   };
 

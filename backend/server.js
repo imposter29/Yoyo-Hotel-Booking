@@ -33,7 +33,7 @@ connectDB();
 //  CORS 
 // CLIENT_URL can be a comma-separated list of exact origins.
 // Vercel preview URLs are also auto-allowed via regex.
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173,http://localhost:5174')
   .split(',')
   .map(o => o.trim());
 

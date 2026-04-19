@@ -14,7 +14,7 @@ function startHoldExpiryJob() {
 
     const expiredHolds = await Booking.find({
       status: 'hold',
-      holdExpiresAt: { $lte: now },
+      holdValidUntil: { $lte: now },
     });
 
     for (const booking of expiredHolds) {

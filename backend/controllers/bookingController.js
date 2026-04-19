@@ -88,7 +88,7 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
     success: true,
     data: {
       booking,
-      holdExpiresAt: booking.holdExpiresAt,
+      holdValidUntil: booking.holdValidUntil,
       referenceNumber: booking.referenceNumber,
     },
   });

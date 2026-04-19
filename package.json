@@ -1,0 +1,27 @@
+{
+  "name": "yoyo-hotel-booking",
+  "version": "1.0.0",
+  "description": "A full-stack hotel booking platform built with the MERN stack. Features a **Yield Pricing Engine** with OOP strategy patterns, real-time inventory tracking, a booking state machine, and a three-tier role system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "start": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imposter29/Yoyo-Hotel-Booking.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imposter29/Yoyo-Hotel-Booking/issues"
+  },
+  "homepage": "https://github.com/imposter29/Yoyo-Hotel-Booking#readme",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
