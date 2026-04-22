@@ -1,10 +1,19 @@
-# Yoyo Hotel Booking 
+# 🏨 Yoyo Hotel Booking
 
-A full-stack hotel booking platform built with the MERN stack. Features a **Yield Pricing Engine** with OOP strategy patterns, real-time inventory tracking, a booking state machine, and a three-tier role system.
+A full-stack hotel booking platform built with the **MERN stack**. Features a **Yield Pricing Engine** with OOP strategy patterns, real-time inventory tracking, a booking state machine, a promo code / coupon discount system, and a three-tier role system.
 
 ---
 
-## Tech Stack
+## 🔗 Live Demo
+
+| Layer | URL |
+|-------|-----|
+| Frontend | [https://yoyo-hotel-booking.vercel.app](https://yoyo-hotel-booking.vercel.app) |
+| Backend API | Deployed on Render |
+
+---
+
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -18,30 +27,48 @@ A full-stack hotel booking platform built with the MERN stack. Features a **Yiel
 
 ---
 
-## Roles
+## 👥 Roles
 
 | Role | Capabilities |
 |------|-------------|
-| `guest` | Search hotels, book rooms, view/cancel bookings, write reviews |
+| `guest` | Search hotels, book rooms, view/cancel bookings, write reviews, apply promo codes |
 | `hotel_admin` | List hotels (pending approval), manage room types, configure pricing rules |
-| `superadmin` | Approve/reject hotels, manage all users and roles |
+| `superadmin` | Approve/reject hotels, manage all users and roles, create deals & promo codes |
 
 ---
 
-## Features
+## 🔑 Super Admin Credentials
+
+> ⚠️ **These are the seeded default credentials. Change them in production.**
+
+| Field | Value |
+|-------|-------|
+| **Email** | `admin@yoyo.com` |
+| **Password** | `Admin@1234` |
+| **Role** | `superadmin` |
+
+The superadmin account is automatically created by either seed script (`seedHotels.js` or `seedGoogleHotels.js`) if no superadmin exists in the database.
+
+---
+
+## ✨ Features
 
 - **Search & Discovery** — Search by city/hotel name, filter by stars and rating, browse by city pills
 - **Dynamic Yield Pricing** — Prices computed at booking time using a composable strategy chain (seasonal, demand, occupancy, length-of-stay, early bird, last-minute)
+- **Promo Code / Coupon System** — Guests can apply deal promo codes at payment; the backend validates the code and applies the discount to the total
 - **Booking State Machine** — `hold → confirmed → cancelled/expired` with 15-min hold TTL
 - **Custom Date Picker** — React-based calendar component (cross-browser, no native input issues)
-- **Real-time Prices on Cards** — Hotel listing shows the cheapest room type's actual price
+- **Real-time Prices on Cards** — Hotel listing shows the cheapest room type's actual yield price
 - **Background Jobs** — Cron job every 5 minutes releases expired holds and restores inventory
 - **Notifications** — Async booking confirmation and cancellation emails via EventEmitter (Observer pattern)
-- **Admin Dashboard** — Full superadmin panel to manage hotels, users, bookings
+- **Deals Management** — Superadmin creates deals with promo codes, discount %, expiry dates, and themed colours
+- **Admin Dashboard** — Full superadmin panel: manage hotels, users, bookings, deals, reviews, newsletter subscribers
+- **Newsletter** — Email subscription / unsubscription with subscriber list visible to superadmin
+- **City Explorer** — Browse hotels grouped by city with stats on the homepage
 
 ---
 
-## OOP Design Patterns
+## 🎨 OOP Design Patterns
 
 | Pattern | File | Description |
 |---------|------|-------------|
@@ -53,84 +80,94 @@ A full-stack hotel booking platform built with the MERN stack. Features a **Yiel
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 Yoyo-Hotel-Booking/
- backend/
-    config/
-       db.js                         # MongoDB connection
-    controllers/
-       authController.js             # Register, Login, GetMe
-       hotelController.js            # Hotel CRUD + search + startingFrom price
-       bookingController.js          # Availability check, Hold, Cancel
-       paymentController.js          # Payment recording
-       reviewController.js           # Hotel reviews
-       roomTypeController.js         # Room type management
-       adminController.js            # Superadmin actions
-    jobs/
-       holdExpiryJob.js              # Cron: expire holds every 5 min
-    middleware/
-       auth.js                       # JWT protect + authorize(roles)
-       errorHandler.js              # Global error handler
-       validators/                   # Joi schema validators
-    models/
-       User.js                       # guest | hotel_admin | superadmin
-       Hotel.js                      # Hotel with geo + amenities + approval
-       RoomType.js                   # Room category + base rate + cancellation policy
-       Room.js                       # Physical room entity
-       Booking.js                    # State machine: hold→confirmed→cancelled
-       InventoryCalendar.js          # Per-day availability + demand index
-       PricingRule.js                # DB-driven pricing rule config
-       Payment.js                    # Payment record
-       Review.js                     # Hotel reviews
-       Deal.js                       # Hotel deals/promotions
-    routes/                           # Express route definitions
-    services/
-       booking/
-          AvailabilityService.js    # Atomic room reservation
-       pricing/
-          PricingStrategy.js        # Abstract base + 6 concrete strategies
-          PricingStrategyFactory.js # Factory: ruleType → strategy class
-          YieldPricingEngine.js     # Engine: loads, composes, applies strategies
-       notification/
-           notificationService.js    # EventEmitter-based email notifications
-    utils/
-       AppError.js                   # Operational error class
-       asyncHandler.js              # Async try/catch wrapper
-    seeds/                            # Database seed scripts
-    server.js                         # Express entry point
-    .env.example
-
- frontend/
-     src/
-         components/
-            common/                   # Navbar, Footer, Layout
-         context/
-            AuthContext.jsx           # JWT auth state + rehydration
-         pages/
-            HomePage.jsx              # Hero search + custom MiniCalendar
-            HotelsPage.jsx            # Listings with real prices + filters
-            HotelDetailPage.jsx       # Gallery, room types, reviews
-            BookingPage.jsx           # Booking form with custom date picker
-            BookingConfirmationPage.jsx
-            PaymentPage.jsx
-            MyBookingsPage.jsx
-            LoginPage.jsx
-            RegisterPage.jsx
-            ProfilePage.jsx
-            ListHotelPage.jsx         # Hotel admin: list a hotel
-            AdminDashboardPage.jsx    # Superadmin dashboard
-         services/
-            api.js                    # Axios instance + interceptors
-         App.jsx                       # Router + protected routes
+├── backend/
+│   ├── config/
+│   │   └── db.js                           # MongoDB connection
+│   ├── controllers/
+│   │   ├── authController.js               # Register, Login, GetMe
+│   │   ├── hotelController.js              # Hotel CRUD + search + startingFrom price
+│   │   ├── bookingController.js            # Availability check, Hold, Cancel
+│   │   ├── paymentController.js            # Payment recording + promo code validation
+│   │   ├── reviewController.js             # Hotel reviews
+│   │   ├── roomTypeController.js           # Room type management
+│   │   ├── dealsController.js              # Deals / promo codes CRUD
+│   │   ├── cityController.js               # City listing + stats
+│   │   ├── newsletterController.js         # Newsletter subscribe/unsubscribe
+│   │   └── adminController.js              # Superadmin actions
+│   ├── jobs/
+│   │   └── holdExpiryJob.js                # Cron: expire holds every 5 min
+│   ├── middleware/
+│   │   ├── auth.js                         # JWT protect + authorize(roles)
+│   │   └── errorHandler.js                 # Global error handler
+│   ├── models/
+│   │   ├── User.js                         # guest | hotel_admin | superadmin
+│   │   ├── Hotel.js                        # Hotel with geo + amenities + approval
+│   │   ├── RoomType.js                     # Room category + base rate + cancellation policy
+│   │   ├── Room.js                         # Physical room entity
+│   │   ├── Booking.js                      # State machine: hold→confirmed→cancelled
+│   │   ├── InventoryCalendar.js            # Per-day availability + demand index
+│   │   ├── PricingRule.js                  # DB-driven pricing rule config
+│   │   ├── Payment.js                      # Payment record
+│   │   ├── Review.js                       # Hotel reviews
+│   │   ├── Deal.js                         # Deals with promo codes, discount %, expiry
+│   │   └── Newsletter.js                   # Email subscriber list
+│   ├── routes/                             # Express route definitions
+│   ├── services/
+│   │   ├── booking/
+│   │   │   └── AvailabilityService.js      # Atomic room reservation
+│   │   ├── pricing/
+│   │   │   ├── PricingStrategy.js          # Abstract base + 6 concrete strategies
+│   │   │   ├── PricingStrategyFactory.js   # Factory: ruleType → strategy class
+│   │   │   └── YieldPricingEngine.js       # Engine: loads, composes, applies strategies
+│   │   └── notification/
+│   │       └── notificationService.js      # EventEmitter-based email notifications
+│   ├── validators/                         # Joi schema validators
+│   ├── utils/
+│   │   ├── AppError.js                     # Operational error class
+│   │   └── asyncHandler.js                 # Async try/catch wrapper
+│   ├── seeds/
+│   │   ├── seedHotels.js                   # Seed from custom CSV
+│   │   └── seedGoogleHotels.js             # Seed from Google Hotel CSV data
+│   ├── server.js                           # Express entry point
+│   └── .env.example
+│
+└── frontend/
+    └── src/
+        ├── components/
+        │   └── common/                     # Navbar, Footer, Layout
+        ├── context/
+        │   ├── AuthContext.jsx             # JWT auth state + rehydration
+        │   └── ToastContext.jsx            # Global toast notifications
+        ├── pages/
+        │   ├── HomePage.jsx                # Hero search + custom MiniCalendar + city pills
+        │   ├── HotelsPage.jsx              # Listings with real prices + filters
+        │   ├── HotelDetailPage.jsx         # Gallery, room types, reviews
+        │   ├── BookingPage.jsx             # Booking form with custom date picker
+        │   ├── BookingConfirmationPage.jsx
+        │   ├── PaymentPage.jsx             # Payment + promo code input + discount display
+        │   ├── MyBookingsPage.jsx
+        │   ├── LoginPage.jsx
+        │   ├── RegisterPage.jsx
+        │   ├── ProfilePage.jsx
+        │   ├── ListHotelPage.jsx           # Hotel admin: list a hotel
+        │   ├── AdminDashboardPage.jsx      # Superadmin dashboard
+        │   └── NotFoundPage.jsx
+        ├── services/
+        │   └── api.js                      # Axios instance + interceptors
+        ├── hooks/                          # Custom React hooks
+        ├── utils/                          # Utility functions
+        └── App.jsx                         # Router + protected routes
 ```
 
 ---
 
-## API Reference
+## 📡 API Reference
 
-Base URL: `http://localhost:3000/api/`
+Base URL: `http://localhost:5000/api/`
 
 ### Auth — `/api/auth`
 | Method | Endpoint | Access | Description |
@@ -145,22 +182,12 @@ Base URL: `http://localhost:3000/api/`
 ### Hotels — `/api/hotels`
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
-| GET | `/` | Public | Search/filter hotels (includes `startingFrom` price) |
+| GET | `/` | Public | Search/filter hotels (includes `startingFrom` yield price) |
 | GET | `/:id` | Public | Get hotel detail with room types |
 | PATCH | `/:id` | hotel_admin | Update hotel info |
 | POST | `/submit` | hotel_admin | Submit hotel for superadmin approval |
 | DELETE | `/:id` | superadmin | Soft-delete (deactivate) a hotel |
 
-### Room Types — `/api/room-types`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/` | Public | List room types (filter by `hotelId`) |
-| GET | `/:id` | Public | Get single room type |
-| POST | `/` | hotel_admin | Create a room type |
-| PATCH | `/:id` | hotel_admin | Update a room type |
-| DELETE | `/:id` | hotel_admin | Delete a room type |
-| GET | `/:id/rooms` | hotel_admin | List physical rooms of this type |
-| POST | `/:id/rooms` | hotel_admin | Add a physical room to this type |
 
 ### Bookings — `/api/bookings`
 | Method | Endpoint | Access | Description |
@@ -177,6 +204,7 @@ Base URL: `http://localhost:3000/api/`
 | POST | `/initiate` | Protected | Initiate a payment for a booking |
 | POST | `/:paymentId/confirm` | Protected | Confirm payment → transitions booking to confirmed |
 | GET | `/booking/:bookingId` | Protected | Get payment record for a booking |
+| POST | `/validate-promo` | Protected | Validate a promo code and get discount amount |
 
 ### Reviews — `/api/hotels/:hotelId/reviews`
 | Method | Endpoint | Access | Description |
@@ -196,16 +224,10 @@ Base URL: `http://localhost:3000/api/`
 |--------|----------|--------|-------------|
 | GET | `/` | Public | List all active deals |
 | GET | `/:id` | Public | Get single deal |
-| POST | `/` | superadmin | Create a deal |
+| POST | `/` | superadmin | Create a deal with promo code |
 | PATCH | `/:id` | superadmin | Update a deal |
 | DELETE | `/:id` | superadmin | Delete a deal |
 
-### Newsletter — `/api/newsletter`
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | `/subscribe` | Public | Subscribe to newsletter |
-| POST | `/unsubscribe` | Public | Unsubscribe |
-| GET | `/subscribers` | superadmin | List all subscribers |
 
 ### Admin — `/api/admin`
 | Method | Endpoint | Access | Description |
@@ -226,7 +248,7 @@ Base URL: `http://localhost:3000/api/`
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -252,29 +274,57 @@ npm run dev
 # Runs on http://localhost:5173
 ```
 
+### Seed the Database
+
+```bash
+# Seed from Google Hotel CSV data (recommended — 500+ hotels)
+cd backend
+node seeds/seedGoogleHotels.js
+
+# Or seed from custom CSV
+node seeds/seedHotels.js
+
+# Wipe all hotel data
+node seeds/seedHotels.js --destroy
+```
+
+> The seed scripts automatically create the superadmin account (`admin@yoyo.com` / `Admin@1234`) if one doesn't exist.
+
 ### Environment Variables
 
 **`backend/.env`**
-```
+```env
 MONGO_URI=mongodb://localhost:27017/yoyo-hotel
 JWT_SECRET=your_jwt_secret_here
-PORT=5000
+PORT=3000
 NODE_ENV=development
 ```
 
 **`frontend/.env`**
-```
-VITE_API_URL=http://localhost:5000/api
+```env
+VITE_API_URL=http://localhost:3000/api
 ```
 
 ---
 
-## Design Documents
+## 🎟️ Promo Code System
+
+The deal/promo code system works end-to-end:
+
+1. **Superadmin** creates a deal in the Admin Dashboard with a unique code (e.g. `SAVE20`), a discount percentage, and an expiry date.
+2. **Guest** adds items to booking and proceeds to the **Payment Page**.
+3. On the Payment Page, the guest enters the promo code → frontend calls `POST /api/payments/validate-promo`.
+4. Backend looks up the `Deal` by `code`, checks `isActive` and `expiresAt`, and returns the discount amount.
+5. The discounted total is displayed and used for the final payment confirmation.
+
+---
+
+## 📐 Design Documents
 
 | File | Description |
 |------|-------------|
-| `idea.md` | Full project concept, OOP principles, design patterns |
-| `classDiagram.md` | UML class diagram — all models and service classes |
-| `ErDiagram.md` | Entity-relationship diagram — all MongoDB collections |
-| `sequenceDiagram.md` | Booking flow sequence — controller → engine → strategies → DB |
-| `useCaseDiagram.md` | Use cases per actor (Guest, HotelAdmin, SuperAdmin, Scheduler) |
+| `diagrams/classDiagram.md` | UML class diagram — all models and service classes |
+| `diagrams/ErDiagram.md` | Entity-relationship diagram — all MongoDB collections |
+| `diagrams/sequenceDiagram.md` | Booking flow + promo code validation sequence |
+| `diagrams/useCaseDiagram.md` | Use cases per actor (Guest, HotelAdmin, SuperAdmin, Scheduler) |
+| `frontend/idea.md` | Full project concept, OOP principles, design patterns |
